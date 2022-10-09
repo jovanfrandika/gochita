@@ -41,7 +41,7 @@ func NotifyShows(showMap map[string]*m.Show) {
 		for showName, episode := range showMap {
 			for episodeNum, episodeDetail := range episode.ShowEpisodeMap {
 				if !episodeDetail.IsNotified {
-					content := fmt.Sprintf("Reminder!!!\nTitle: %v\nEpisode: %v\nPublished Date: %v\n", showName, episodeNum, episodeDetail.PubDate.Format(time.RFC850))
+					content := fmt.Sprintf("***Reminder!!!***\nTitle: %v\nEpisode: %v\nPublished Date: %v\n", showName, episodeNum, episodeDetail.PubDate.Format(time.RFC850))
 					dg.ChannelMessageSendComplex(config.App.ChannelID, &discordgo.MessageSend{
 						Content: content,
 						Embeds: []*discordgo.MessageEmbed{

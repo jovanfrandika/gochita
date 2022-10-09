@@ -17,7 +17,7 @@ func main() {
 		for {
 			mtx.Lock()
 			showMap, err := parser.Parse()
-			if err != nil {
+			if err == nil {
 				bot.NotifyShows(showMap)
 			}
 			mtx.Unlock()
