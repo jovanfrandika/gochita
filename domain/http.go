@@ -1,14 +1,5 @@
 package model
 
-import "time"
-
-type Config struct {
-	ChannelID string `json:channelId`
-	RSSUrl    string `json:rssUrl`
-	Timezone  string `json:timezone`
-	Token     string `json:token`
-}
-
 type Enclosure struct {
 	Url    string `xml:"url,attr"`
 	Length int64  `xml:"length,attr"`
@@ -33,19 +24,4 @@ type Channel struct {
 
 type Rss struct {
 	Channel Channel `xml:"channel"`
-}
-
-type ShowEpisode struct {
-	Episode    string
-	Link       string
-	IsNotified bool
-	PubDate    time.Time
-}
-
-type Show struct {
-	Title          string
-	Category       string
-	Link           string
-	Enclosure      Enclosure
-	ShowEpisodeMap map[string]*ShowEpisode
 }
