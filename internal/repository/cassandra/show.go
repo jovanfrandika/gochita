@@ -7,13 +7,15 @@ import (
 	m "github.com/jovanfrandika/livechart-notifier/domain"
 )
 
+func (r *repository) GetShowById(ctx context.Context, showId string) (show m.DbShow, err error) {
+	show = m.DbShow{}
+	err = r.session.Query(queryGetShowById, showId).Consistency(gocql.One).Scan(&show.Id, &show.Title, &show.Thumbnail, &show.Category, &show.Ref)
+	return show, err
+}
+
 func (r *repository) GetShowByTitle(ctx context.Context, title string) (show m.DbShow, err error) {
 	show = m.DbShow{}
 	err = r.session.Query(queryGetShowByTitle, title).Consistency(gocql.One).Scan(&show.Id, &show.Title, &show.Thumbnail, &show.Category, &show.Ref)
-	if err != nil {
-		return m.DbShow{}, err
-	}
-
 	return show, err
 }
 

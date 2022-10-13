@@ -7,6 +7,7 @@ type delivery struct {
 }
 
 type Delivery interface {
+	Init()
 	AddShowEpisodes()
 }
 

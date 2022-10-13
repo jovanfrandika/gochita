@@ -1,28 +1,31 @@
 package rDiscord
 
 import (
-	"fmt"
+	"log"
 
 	"github.com/bwmarrin/discordgo"
-	"github.com/jovanfrandika/livechart-notifier/config"
 )
 
-type BotClient struct {
+type discordBotRepo struct {
 	dg *discordgo.Session
 }
 
-func New() *BotClient {
+type DiscordBotRepo interface {
+	AddHandler(handler interface{})
+	Connect() (err error)
+	Close()
+	SendMsgToChannel(channelId string, msg *discordgo.MessageSend)
+}
+
+func New(token string) DiscordBotRepo {
 	var err error
 
-	dg, err := discordgo.New("Bot " + config.Cfg.Bot.Token)
+	dg, err := discordgo.New("Bot " + token)
 	if err != nil {
-		fmt.Println("error creating Discord session,", err)
-		return nil
+		log.Fatal(err)
 	}
 
-	botClient := &BotClient{
+	return &discordBotRepo{
 		dg: dg,
 	}
-
-	return botClient
 }

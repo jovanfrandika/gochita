@@ -1,31 +1,30 @@
 package rDiscord
 
-import (
-	"fmt"
-)
+import "github.com/bwmarrin/discordgo"
 
-const (
-	LABEL_NEW_EPISODE = "***Reminder!!!***\nTitle: %v\nEpisode: %v\nPublished Date: %v\n"
-)
-
-func (client *BotClient) Connect() error {
-	tries := 0
-
-	var err error
-	for tries < 3 {
-		err = client.dg.Open()
-		if err != nil {
-			fmt.Println("error opening connection,", err)
-		}
-		tries++
+func (client *discordBotRepo) AddHandler(handler interface{}) {
+	if client.dg == nil {
+		return
 	}
 
+	client.dg.AddHandler(handler)
+}
+
+func (client *discordBotRepo) Connect() (err error) {
+	err = client.dg.Open()
 	return err
 }
 
-func (client *BotClient) Close() {
+func (client *discordBotRepo) Close() {
 	if client.dg == nil {
 		return
 	}
 	client.dg.Close()
+}
+
+func (client *discordBotRepo) SendMsgToChannel(channelId string, msg *discordgo.MessageSend) {
+	if client.dg == nil {
+		return
+	}
+	client.dg.ChannelMessageSendComplex(channelId, msg)
 }

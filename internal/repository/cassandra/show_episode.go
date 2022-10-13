@@ -2,6 +2,7 @@ package rCassandra
 
 import (
 	"context"
+	"time"
 
 	"github.com/gocql/gocql"
 	m "github.com/jovanfrandika/livechart-notifier/domain"
@@ -10,6 +11,20 @@ import (
 func (r *repository) GetShowEpisodesByShowId(ctx context.Context, showId string) (showEpisodes []m.DbShowEpisode, err error) {
 	showEpisodes = []m.DbShowEpisode{}
 	iter := r.session.Query(queryGetShowEpisodesByShowId, showId).Iter()
+	var showEpisode m.DbShowEpisode
+	for iter.Scan(&showEpisode.Id, &showEpisode.ShowId, &showEpisode.Num, &showEpisode.PubDate) {
+		showEpisodes = append(showEpisodes, showEpisode)
+	}
+	if err = iter.Close(); err != nil {
+		return []m.DbShowEpisode{}, err
+	}
+
+	return showEpisodes, err
+}
+
+func (r *repository) GetShowEpisodesByRange(ctx context.Context, start, end time.Time) (showEpisodes []m.DbShowEpisode, err error) {
+	showEpisodes = []m.DbShowEpisode{}
+	iter := r.session.Query(queryGetShowEpisodesByRange, start, end).Iter()
 	var showEpisode m.DbShowEpisode
 	for iter.Scan(&showEpisode.Id, &showEpisode.ShowId, &showEpisode.Num, &showEpisode.PubDate) {
 		showEpisodes = append(showEpisodes, showEpisode)
