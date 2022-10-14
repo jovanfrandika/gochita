@@ -14,7 +14,7 @@ func (r *repository) GetSubscriptionsByReferenceId(ctx context.Context, referenc
 		return []m.DbChannelShowSubscription{}, err
 	}
 	var channelShowSubscription m.DbChannelShowSubscription
-	for iter.Scan(&channelShowSubscription.ShowId, &channelShowSubscription.ReferenceId, &channelShowSubscription.IsEnabled) {
+	for iter.Scan(&channelShowSubscription.ReferenceId, &channelShowSubscription.ShowId, &channelShowSubscription.IsEnabled) {
 		channelShowSubscriptions = append(channelShowSubscriptions, channelShowSubscription)
 	}
 	if err = iter.Close(); err != nil {
@@ -31,7 +31,7 @@ func (r *repository) GetSubscriptionsByShowId(ctx context.Context, showId string
 		return []m.DbChannelShowSubscription{}, err
 	}
 	var channelShowSubscription m.DbChannelShowSubscription
-	for iter.Scan(&channelShowSubscription.ShowId, &channelShowSubscription.ReferenceId, &channelShowSubscription.IsEnabled) {
+	for iter.Scan(&channelShowSubscription.ReferenceId, &channelShowSubscription.ShowId, &channelShowSubscription.IsEnabled) {
 		channelShowSubscriptions = append(channelShowSubscriptions, channelShowSubscription)
 	}
 	if err = iter.Close(); err != nil {
@@ -41,9 +41,9 @@ func (r *repository) GetSubscriptionsByShowId(ctx context.Context, showId string
 	return channelShowSubscriptions, err
 }
 
-func (r *repository) GetSubscription(ctx context.Context, showId, referenceId string) (channelShowSubscription m.DbChannelShowSubscription, err error) {
+func (r *repository) GetSubscription(ctx context.Context, referenceId, showId string) (channelShowSubscription m.DbChannelShowSubscription, err error) {
 	channelShowSubscription = m.DbChannelShowSubscription{}
-	err = r.session.Query(queryGetSubscriptionsByReferenceId, showId, referenceId).Consistency(gocql.One).Scan(&channelShowSubscription.ShowId, &channelShowSubscription.ReferenceId, &channelShowSubscription.IsEnabled)
+	err = r.session.Query(queryGetSubscription, referenceId, showId).Consistency(gocql.One).Scan(&channelShowSubscription.ReferenceId, &channelShowSubscription.ShowId, &channelShowSubscription.IsEnabled)
 	if err != nil {
 		return m.DbChannelShowSubscription{}, err
 	}
@@ -51,12 +51,12 @@ func (r *repository) GetSubscription(ctx context.Context, showId, referenceId st
 	return channelShowSubscription, err
 }
 
-func (r *repository) CreateSubscription(ctx context.Context, showId, referenceId string) (err error) {
-	err = r.session.Query(queryCreateSubscription, showId, referenceId).Exec()
+func (r *repository) CreateSubscription(ctx context.Context, referenceId, showId string) (err error) {
+	err = r.session.Query(queryCreateSubscription, referenceId, showId).Exec()
 	return err
 }
 
-func (r *repository) ToggleSubscription(ctx context.Context, isEnabled bool, showId, referenceId string) (err error) {
-	err = r.session.Query(queryToggleSubscription, isEnabled, showId, referenceId).Exec()
+func (r *repository) ToggleSubscription(ctx context.Context, isEnabled bool, referenceId, showId string) (err error) {
+	err = r.session.Query(queryToggleSubscription, isEnabled, referenceId, showId).Exec()
 	return err
 }

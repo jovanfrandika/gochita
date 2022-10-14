@@ -9,45 +9,6 @@ import (
 	"github.com/bwmarrin/discordgo"
 )
 
-var (
-	QUERY = "query"
-
-	COMMAND_SHOW_LIST        = "show-list"
-	COMMAND_SHOW_SUBSCRIBE   = "show-subscribe"
-	COMMAND_SHOW_UNSUBSCRIBE = "show-unsubscribe"
-
-	commands = []*discordgo.ApplicationCommand{
-		{
-			Name:        COMMAND_SHOW_LIST,
-			Description: "List subscribed shows of this channel",
-		},
-		{
-			Name:        COMMAND_SHOW_SUBSCRIBE,
-			Description: "Subscribe show to this channel",
-			Options: []*discordgo.ApplicationCommandOption{
-				{
-					Type:        discordgo.ApplicationCommandOptionString,
-					Name:        QUERY,
-					Description: "Show title",
-					Required:    true,
-				},
-			},
-		},
-		{
-			Name:        COMMAND_SHOW_UNSUBSCRIBE,
-			Description: "Unsubscribe show to this channel",
-			Options: []*discordgo.ApplicationCommandOption{
-				{
-					Type:        discordgo.ApplicationCommandOptionString,
-					Name:        QUERY,
-					Description: "Show title",
-					Required:    true,
-				},
-			},
-		},
-	}
-)
-
 func (d *delivery) RunNotifier() {
 	go func() {
 		for {
@@ -94,12 +55,15 @@ func (d *delivery) getSubscriptions(s *discordgo.Session, i *discordgo.Interacti
 		log.Println(fmt.Sprintf("%v handler start: %v; timeout: %v;", i.ApplicationCommandData().Name, now, ctx.Err()))
 	case <-ch:
 		if err != nil {
-			log.Println(fmt.Sprintf("%v handler start: %v; cancelled: %v;", i.ApplicationCommandData().Name, now, ctx.Err()))
+			log.Println(fmt.Sprintf("%v handler start: %v; cancelled: %v;", i.ApplicationCommandData().Name, now, err))
 		}
 	}
 
-	s.FollowupMessageCreate(i.Interaction, true, &discordgo.WebhookParams{
-		Content: content,
+	s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
+		Type: discordgo.InteractionResponseChannelMessageWithSource,
+		Data: &discordgo.InteractionResponseData{
+			Content: content,
+		},
 	})
 }
 
@@ -126,12 +90,15 @@ func (d *delivery) unsubscribe(s *discordgo.Session, i *discordgo.InteractionCre
 		log.Println(fmt.Sprintf("%v handler start: %v; timeout: %v;", i.ApplicationCommandData().Name, now, ctx.Err()))
 	case <-ch:
 		if err != nil {
-			log.Println(fmt.Sprintf("%v handler start: %v; cancelled: %v;", i.ApplicationCommandData().Name, now, ctx.Err()))
+			log.Println(fmt.Sprintf("%v handler start: %v; cancelled: %v;", i.ApplicationCommandData().Name, now, err))
 		}
 	}
 
-	s.FollowupMessageCreate(i.Interaction, true, &discordgo.WebhookParams{
-		Content: content,
+	s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
+		Type: discordgo.InteractionResponseChannelMessageWithSource,
+		Data: &discordgo.InteractionResponseData{
+			Content: content,
+		},
 	})
 }
 
@@ -158,12 +125,15 @@ func (d *delivery) subscribe(s *discordgo.Session, i *discordgo.InteractionCreat
 		log.Println(fmt.Sprintf("%v handler start: %v; timeout: %v;", i.ApplicationCommandData().Name, now, ctx.Err()))
 	case <-ch:
 		if err != nil {
-			log.Println(fmt.Sprintf("%v handler start: %v; cancelled: %v;", i.ApplicationCommandData().Name, now, ctx.Err()))
+			log.Println(fmt.Sprintf("%v handler start: %v; cancelled: %v;", i.ApplicationCommandData().Name, now, err))
 		}
 	}
 
-	s.FollowupMessageCreate(i.Interaction, true, &discordgo.WebhookParams{
-		Content: content,
+	s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
+		Type: discordgo.InteractionResponseChannelMessageWithSource,
+		Data: &discordgo.InteractionResponseData{
+			Content: content,
+		},
 	})
 }
 
@@ -184,17 +154,49 @@ func (d *delivery) doNotifyLatestEpisodes() {
 		log.Println(fmt.Sprintf("DoNotifyLatestEpisodes start: %v; timeout: %v;", now, ctx.Err()))
 	case <-ch:
 		if err != nil {
-			log.Println(fmt.Sprintf("DoNotifyLatestEpisodes handler start: %v; cancelled: %v;", now, ctx.Err()))
+			log.Println(fmt.Sprintf("DoNotifyLatestEpisodes handler start: %v; cancelled: %v;", now, err))
 		}
 	}
 }
 
-// TODO
 func (d *delivery) RegisterCommands() {
-	return
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	var err error
+	ch := make(chan int)
+	go func() {
+		d.cmds, err = (*d.usecase).RegisterCommands(ctx, commands)
+		ch <- 1
+	}()
+
+	select {
+	case <-ctx.Done():
+		log.Fatal(fmt.Sprintf("RegisterCommands timeout: %v;", ctx.Err()))
+	case <-ch:
+		if err != nil {
+			log.Fatal(fmt.Sprintf("RegisterCommands cancelled: %v;", err))
+		}
+	}
 }
 
-// TODO
 func (d *delivery) UnregisterCommands() {
-	return
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	var err error
+	ch := make(chan int)
+	go func() {
+		err = (*d.usecase).UnregisterCommands(ctx, commands)
+		ch <- 1
+	}()
+
+	select {
+	case <-ctx.Done():
+		log.Println(fmt.Sprintf("UnregisterCommands timeout: %v;", ctx.Err()))
+	case <-ch:
+		if err != nil {
+			log.Println(fmt.Sprintf("UnregisterCommands cancelled: %v;", err))
+		}
+	}
 }

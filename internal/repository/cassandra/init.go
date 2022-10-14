@@ -26,9 +26,9 @@ type Repository interface {
 
 	GetSubscriptionsByReferenceId(ctx context.Context, referenceId string) (channelShowSubscriptions []m.DbChannelShowSubscription, err error)
 	GetSubscriptionsByShowId(ctx context.Context, showId string) (channelShowSubscriptions []m.DbChannelShowSubscription, err error)
-	GetSubscription(ctx context.Context, showId, referenceId string) (channelShowSubscription m.DbChannelShowSubscription, err error)
-	CreateSubscription(ctx context.Context, showId, referenceId string) (err error)
-	ToggleSubscription(ctx context.Context, isEnabled bool, showId, referenceId string) (err error)
+	GetSubscription(ctx context.Context, referenceId, showId string) (channelShowSubscription m.DbChannelShowSubscription, err error)
+	CreateSubscription(ctx context.Context, referenceId, showId string) (err error)
+	ToggleSubscription(ctx context.Context, isEnabled bool, referenceId, showId string) (err error)
 
 	GetNotification(ctx context.Context, showEpisodeId, referenceId string) (channelShowEpisodeNotification m.DbChannelShowEpisodeNotification, err error)
 	CreateNotification(ctx context.Context, showId, referenceId string) (err error)

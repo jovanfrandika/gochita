@@ -1,8 +1,12 @@
 package dBot
 
-import uBot "github.com/jovanfrandika/livechart-notifier/internal/usecase/bot"
+import (
+	"github.com/bwmarrin/discordgo"
+	uBot "github.com/jovanfrandika/livechart-notifier/internal/usecase/bot"
+)
 
 type delivery struct {
+	cmds    []*discordgo.ApplicationCommand
 	usecase *uBot.Usecase
 }
 
@@ -16,5 +20,6 @@ type Delivery interface {
 func New(usecase *uBot.Usecase) *delivery {
 	return &delivery{
 		usecase: usecase,
+		cmds:    []*discordgo.ApplicationCommand{},
 	}
 }

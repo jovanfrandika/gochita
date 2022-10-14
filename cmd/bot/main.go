@@ -1,6 +1,7 @@
-package livechart
+package main
 
 import (
+	"log"
 	"os"
 	"os/signal"
 	"syscall"
@@ -16,6 +17,9 @@ func main() {
 	cfg := config.Init()
 
 	discordBotRepo := rDiscord.New(cfg.Bot.Token)
+	if err := discordBotRepo.Connect(); err != nil {
+		log.Fatal(err)
+	}
 	defer discordBotRepo.Close()
 
 	dbRepo := rCassandra.New(cfg.DB.Clusters, cfg.DB.KeyspaceName)
@@ -24,10 +28,11 @@ func main() {
 	u := uBot.New(&dbRepo, &discordBotRepo)
 	d := dBot.New(&u)
 
-	go d.RunNotifier()
 	d.RegisterCommands()
-	defer d.UnregisterCommands()
 	d.InitHandler()
+	defer d.UnregisterCommands()
+
+	go d.RunNotifier()
 
 	sc := make(chan os.Signal, 1)
 	signal.Notify(sc, syscall.SIGINT, syscall.SIGTERM, os.Interrupt, os.Kill)

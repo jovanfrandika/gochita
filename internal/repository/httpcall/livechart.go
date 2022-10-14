@@ -12,12 +12,6 @@ import (
 	m "github.com/jovanfrandika/livechart-notifier/domain"
 )
 
-const (
-	threeDays = 3 * 24 * time.Hour
-
-	uriLatestEpisodes = "/feeds/episodes"
-)
-
 func (r *repository) GetLatestEpisodes() (showMap map[string]m.FeedShow, err error) {
 	resp, err := http.Get(r.baseUrl + uriLatestEpisodes)
 	if err != nil {
@@ -39,16 +33,15 @@ func (r *repository) GetLatestEpisodes() (showMap map[string]m.FeedShow, err err
 
 	showMap = map[string]m.FeedShow{}
 	for _, item := range rss.Channel.Items {
+		var showEpisodeNum int
 		showEpisodeArr := regex.FindAllString(item.Title, 1)
-		if len(showEpisodeArr) < 0 {
-			continue
-		}
-
-		showEpisodeStr := strings.Trim(showEpisodeArr[0], "#")
-		showEpisodeNum, err := strconv.Atoi(showEpisodeStr)
-		if err != nil {
-			log.Printf(err.Error())
-			continue
+		if len(showEpisodeArr) > 0 {
+			showEpisodeStr := strings.Trim(showEpisodeArr[0], "#")
+			showEpisodeNum, err = strconv.Atoi(showEpisodeStr)
+			if err != nil {
+				log.Printf(err.Error())
+				continue
+			}
 		}
 
 		showName := strings.TrimSpace(regex.ReplaceAllString(item.Title, ""))

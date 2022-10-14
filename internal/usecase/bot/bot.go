@@ -10,20 +10,6 @@ import (
 	m "github.com/jovanfrandika/livechart-notifier/domain"
 )
 
-const (
-	LABEL_NEW_EPISODE        = "***Reminder!!!***\nTitle: %v\nEpisode: %v\nPublished Date: %v\n"
-	LABEL_SUBSCRIPTION_TITLE = "%v. %v\n"
-
-	LABEL_SUCCESS_SUBSCRIBED   = "%v successfully subscribed!"
-	LABEL_UNSUCCESS_SUBSCRIBED = "%v subscription failed :("
-
-	LABEL_SUCCESS_UNSUBSCRIBED   = "%v successfully unsubscribed!"
-	LABEL_UNSUCCESS_UNSUBSCRIBED = "%v unsubscription failed :("
-
-	NO_SUBSCRIPTIONS = "No subscriptions"
-	DEFAULT_ERROR    = "Oops something went wrong!"
-)
-
 func (u *usecase) AddHandler(handler interface{}) {
 	(*u.discordBotRepo).AddHandler(handler)
 }
@@ -59,11 +45,11 @@ func (u *usecase) Subscribe(ctx context.Context, referenceId string, showTitle s
 		return fmt.Sprintf(LABEL_UNSUCCESS_SUBSCRIBED, showTitle), err
 	}
 
-	dbSubscription, err := (*u.dbRepo).GetSubscription(ctx, dbShow.Id, referenceId)
+	dbSubscription, err := (*u.dbRepo).GetSubscription(ctx, referenceId, dbShow.Id)
 	if err == gocql.ErrNotFound {
-		err = (*u.dbRepo).CreateSubscription(ctx, dbShow.Id, referenceId)
+		err = (*u.dbRepo).CreateSubscription(ctx, referenceId, dbShow.Id)
 	} else if !dbSubscription.IsEnabled {
-		err = (*u.dbRepo).ToggleSubscription(ctx, true, dbShow.Id, referenceId)
+		err = (*u.dbRepo).ToggleSubscription(ctx, true, referenceId, dbShow.Id)
 	}
 	if err != nil {
 		return fmt.Sprintf(LABEL_UNSUCCESS_SUBSCRIBED, showTitle), err
@@ -78,9 +64,9 @@ func (u *usecase) Unsubscribe(ctx context.Context, referenceId string, showTitle
 		return fmt.Sprintf(LABEL_UNSUCCESS_UNSUBSCRIBED, showTitle), err
 	}
 
-	dbSubscription, err := (*u.dbRepo).GetSubscription(ctx, dbShow.Id, referenceId)
+	dbSubscription, err := (*u.dbRepo).GetSubscription(ctx, referenceId, dbShow.Id)
 	if err != nil && dbSubscription.IsEnabled {
-		err = (*u.dbRepo).ToggleSubscription(ctx, false, dbShow.Id, referenceId)
+		err = (*u.dbRepo).ToggleSubscription(ctx, false, referenceId, dbShow.Id)
 	}
 	if err != nil {
 		return fmt.Sprintf(LABEL_UNSUCCESS_UNSUBSCRIBED, showTitle), err
@@ -115,8 +101,14 @@ func (u *usecase) NotifyNewEpisodes(ctx context.Context) (err error) {
 			showIdToChannelMap[latestEpisode.ShowId] = dbChannelShowSubscriptions
 		}
 
+		var content string
+		if latestEpisode.Num != 0 {
+			content = fmt.Sprintf(LABEL_NEW_SERIES_EPISODE, showMap[latestEpisode.ShowId].Title, latestEpisode.Num, latestEpisode.PubDate.Format(time.RFC850))
+		} else {
+			content = fmt.Sprintf(LABEL_NEW_MOVIE_EPISODE, showMap[latestEpisode.ShowId].Title, latestEpisode.PubDate.Format(time.RFC850))
+		}
 		msg := &discordgo.MessageSend{
-			Content: fmt.Sprintf(LABEL_NEW_EPISODE, showMap[latestEpisode.ShowId].Title, latestEpisode.Num, latestEpisode.PubDate.Format(time.RFC850)),
+			Content: content,
 			Embeds: []*discordgo.MessageEmbed{
 				{
 					Image: &discordgo.MessageEmbedImage{
@@ -135,6 +127,30 @@ func (u *usecase) NotifyNewEpisodes(ctx context.Context) (err error) {
 					return err
 				}
 			}
+		}
+	}
+
+	return nil
+}
+
+func (u *usecase) RegisterCommands(ctx context.Context, cmds []*discordgo.ApplicationCommand) (ccmds []*discordgo.ApplicationCommand, err error) {
+	ccmds = make([]*discordgo.ApplicationCommand, len(cmds))
+	for i, cmd := range cmds {
+		ccmd, err := (*u.discordBotRepo).RegisterCommand(cmd)
+		if err != nil {
+			return []*discordgo.ApplicationCommand{}, err
+		}
+		ccmds[i] = ccmd
+	}
+
+	return ccmds, nil
+}
+
+func (u *usecase) UnregisterCommands(ctx context.Context, cmds []*discordgo.ApplicationCommand) (err error) {
+	for _, cmd := range cmds {
+		err = (*u.discordBotRepo).UnregisterCommand(cmd)
+		if err != nil {
+			return err
 		}
 	}
 

@@ -1,4 +1,4 @@
-package livechart
+package main
 
 import (
 	"log"

@@ -30,6 +30,7 @@ const (
 		FROM showEpisode
 		WHERE publishedAt >= ? AND publishedAt <= ? 
 		LIMIT 100
+		ALLOW FILTERING
 	`
 	queryCreateShowEpisode = `
 		INSERT INTO showEpisode (id, showId, num, publishedAt)
@@ -38,23 +39,23 @@ const (
 
 	// ChannelShowSubscription
 	queryGetSubscriptionsByReferenceId = `
-		SELECT showId, referenceId, isEnabled
+		SELECT referenceId, showId,, isEnabled
 		FROM channelShowSubscription
 		WHERE referenceId = ?
 	`
 	queryGetSubscriptionsByShowId = `
-		SELECT showId, referenceId, isEnabled
+		SELECT referenceId, showId, isEnabled
 		FROM channelShowSubscription
 		WHERE showId = ?
 	`
 	queryGetSubscription = `
-		SELECT showId, referenceId, isEnabled
+		SELECT referenceId, showId, isEnabled
 		FROM channelShowSubscription
 		WHERE referenceId = ? AND showId = ?
 		LIMIT 1
 	`
 	queryCreateSubscription = `
-		INSERT INTO channelShowSubscription (showId, referenceId, isEnabled)
+		INSERT INTO channelShowSubscription (referenceId, showId, isEnabled)
 		VALUES (?, ?, true)
 	`
 	queryToggleSubscription = `

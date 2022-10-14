@@ -3,6 +3,7 @@ package uBot
 import (
 	"context"
 
+	"github.com/bwmarrin/discordgo"
 	rCassandra "github.com/jovanfrandika/livechart-notifier/internal/repository/cassandra"
 	rDiscord "github.com/jovanfrandika/livechart-notifier/internal/repository/discord"
 )
@@ -18,6 +19,8 @@ type Usecase interface {
 	Subscribe(ctx context.Context, referenceId string, showTitle string) (content string, err error)
 	Unsubscribe(ctx context.Context, referenceId string, showTitle string) (content string, err error)
 	NotifyNewEpisodes(ctx context.Context) (err error)
+	RegisterCommands(ctx context.Context, cmds []*discordgo.ApplicationCommand) (ccmds []*discordgo.ApplicationCommand, err error)
+	UnregisterCommands(ctx context.Context, cmds []*discordgo.ApplicationCommand) (err error)
 }
 
 func New(dbRepo *rCassandra.Repository, discordBotRepo *rDiscord.DiscordBotRepo) Usecase {
