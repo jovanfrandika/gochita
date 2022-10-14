@@ -15,16 +15,13 @@ func (u *usecase) AddHandler(handler interface{}) {
 }
 
 func (u *usecase) GetSubscriptions(ctx context.Context, referenceId string) (content string, err error) {
-	dbSubscriptions, err := (*u.dbRepo).GetSubscriptionsByReferenceId(ctx, referenceId)
+	dbSubscriptions, err := (*u.dbRepo).GetSubscriptionsByReferenceId(ctx, referenceId, true)
 	if err != nil {
 		return DEFAULT_ERROR, err
 	}
 
-	if len(dbSubscriptions) < 0 {
-		(*u.discordBotRepo).SendMsgToChannel(referenceId, &discordgo.MessageSend{
-			Content: NO_SUBSCRIPTIONS,
-		})
-		return DEFAULT_ERROR, err
+	if len(dbSubscriptions) <= 0 {
+		return NO_SUBSCRIPTIONS, nil
 	}
 
 	content = "Subscriptions\n"
@@ -64,8 +61,8 @@ func (u *usecase) Unsubscribe(ctx context.Context, referenceId string, showTitle
 		return fmt.Sprintf(LABEL_UNSUCCESS_UNSUBSCRIBED, showTitle), err
 	}
 
-	dbSubscription, err := (*u.dbRepo).GetSubscription(ctx, referenceId, dbShow.Id)
-	if err != nil && dbSubscription.IsEnabled {
+	dbSubscription, _ := (*u.dbRepo).GetSubscription(ctx, referenceId, dbShow.Id)
+	if dbSubscription.IsEnabled {
 		err = (*u.dbRepo).ToggleSubscription(ctx, false, referenceId, dbShow.Id)
 	}
 	if err != nil {
@@ -94,7 +91,7 @@ func (u *usecase) NotifyNewEpisodes(ctx context.Context) (err error) {
 		}
 
 		if _, exists := showIdToChannelMap[latestEpisode.ShowId]; !exists {
-			dbChannelShowSubscriptions, err := (*u.dbRepo).GetSubscriptionsByShowId(ctx, latestEpisode.ShowId)
+			dbChannelShowSubscriptions, err := (*u.dbRepo).GetSubscriptionsByShowId(ctx, latestEpisode.ShowId, true)
 			if err != nil {
 				return err
 			}
@@ -103,9 +100,9 @@ func (u *usecase) NotifyNewEpisodes(ctx context.Context) (err error) {
 
 		var content string
 		if latestEpisode.Num != 0 {
-			content = fmt.Sprintf(LABEL_NEW_SERIES_EPISODE, showMap[latestEpisode.ShowId].Title, latestEpisode.Num, latestEpisode.PubDate.Format(time.RFC850))
+			content = fmt.Sprintf(LABEL_NEW_SERIES_EPISODE, showMap[latestEpisode.ShowId].Title, latestEpisode.Num, latestEpisode.PubDate.In(u.timeLocation).Format(time.RFC850))
 		} else {
-			content = fmt.Sprintf(LABEL_NEW_MOVIE_EPISODE, showMap[latestEpisode.ShowId].Title, latestEpisode.PubDate.Format(time.RFC850))
+			content = fmt.Sprintf(LABEL_NEW_MOVIE_EPISODE, showMap[latestEpisode.ShowId].Title, latestEpisode.PubDate.In(u.timeLocation).Format(time.RFC850))
 		}
 		msg := &discordgo.MessageSend{
 			Content: content,
@@ -119,10 +116,10 @@ func (u *usecase) NotifyNewEpisodes(ctx context.Context) (err error) {
 			},
 		}
 		for _, channel := range showIdToChannelMap[latestEpisode.ShowId] {
-			_, err := (*u.dbRepo).GetNotification(ctx, latestEpisode.ShowId, channel.ReferenceId)
+			_, err := (*u.dbRepo).GetNotification(ctx, channel.ReferenceId, latestEpisode.ShowId)
 			if err == gocql.ErrNotFound {
 				(*u.discordBotRepo).SendMsgToChannel(channel.ReferenceId, msg)
-				err = (*u.dbRepo).CreateNotification(ctx, latestEpisode.ShowId, channel.ReferenceId)
+				err = (*u.dbRepo).CreateNotification(ctx, channel.ReferenceId, latestEpisode.ShowId)
 				if err != nil {
 					return err
 				}

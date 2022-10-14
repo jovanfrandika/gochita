@@ -24,8 +24,8 @@ type Repository interface {
 	GetShowEpisodesByRange(ctx context.Context, start, end time.Time) (showEpisodes []m.DbShowEpisode, err error)
 	CreateShowEpisode(ctx context.Context, showId string, showEpisode m.FeedShowEpisode) (showEpisodeId string, err error)
 
-	GetSubscriptionsByReferenceId(ctx context.Context, referenceId string) (channelShowSubscriptions []m.DbChannelShowSubscription, err error)
-	GetSubscriptionsByShowId(ctx context.Context, showId string) (channelShowSubscriptions []m.DbChannelShowSubscription, err error)
+	GetSubscriptionsByReferenceId(ctx context.Context, referenceId string, isEnabled bool) (channelShowSubscriptions []m.DbChannelShowSubscription, err error)
+	GetSubscriptionsByShowId(ctx context.Context, showId string, isEnabled bool) (channelShowSubscriptions []m.DbChannelShowSubscription, err error)
 	GetSubscription(ctx context.Context, referenceId, showId string) (channelShowSubscription m.DbChannelShowSubscription, err error)
 	CreateSubscription(ctx context.Context, referenceId, showId string) (err error)
 	ToggleSubscription(ctx context.Context, isEnabled bool, referenceId, showId string) (err error)

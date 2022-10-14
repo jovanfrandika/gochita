@@ -39,14 +39,16 @@ const (
 
 	// ChannelShowSubscription
 	queryGetSubscriptionsByReferenceId = `
-		SELECT referenceId, showId,, isEnabled
+		SELECT referenceId, showId, isEnabled
 		FROM channelShowSubscription
-		WHERE referenceId = ?
+		WHERE referenceId = ? AND isEnabled = ?
+		ALLOW FILTERING
 	`
 	queryGetSubscriptionsByShowId = `
 		SELECT referenceId, showId, isEnabled
 		FROM channelShowSubscription
-		WHERE showId = ?
+		WHERE showId = ? AND isEnabled = ?
+		ALLOW FILTERING
 	`
 	queryGetSubscription = `
 		SELECT referenceId, showId, isEnabled
@@ -67,13 +69,13 @@ const (
 
 	// ChannelShowEpisodeNotificiation
 	queryGetNotification = `
-		SELECT showEpisodeId, referenceId, notifiedAt
-		FROM channelShowEpisodeNotificiation
+		SELECT referenceId, showEpisodeId, notifiedAt
+		FROM channelShowEpisodeNotification
 		WHERE referenceId = ? AND showEpisodeId = ?
 		LIMIT 1
 	`
 	queryCreateNotification = `
-		INSERT INTO channelShowEpisodeNotificiation (showEpisode, referenceId, notifiedAt)
+		INSERT INTO channelShowEpisodeNotification (referenceId, showEpisodeId, notifiedAt)
 		VALUES (?, ?, ?)
 	`
 )

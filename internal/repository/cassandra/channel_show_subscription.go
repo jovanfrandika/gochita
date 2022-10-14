@@ -7,9 +7,9 @@ import (
 	m "github.com/jovanfrandika/livechart-notifier/domain"
 )
 
-func (r *repository) GetSubscriptionsByReferenceId(ctx context.Context, referenceId string) (channelShowSubscriptions []m.DbChannelShowSubscription, err error) {
+func (r *repository) GetSubscriptionsByReferenceId(ctx context.Context, referenceId string, isEnabled bool) (channelShowSubscriptions []m.DbChannelShowSubscription, err error) {
 	channelShowSubscriptions = []m.DbChannelShowSubscription{}
-	iter := r.session.Query(queryGetSubscriptionsByReferenceId, referenceId).Iter()
+	iter := r.session.Query(queryGetSubscriptionsByReferenceId, referenceId, isEnabled).Iter()
 	if err != nil {
 		return []m.DbChannelShowSubscription{}, err
 	}
@@ -24,9 +24,9 @@ func (r *repository) GetSubscriptionsByReferenceId(ctx context.Context, referenc
 	return channelShowSubscriptions, err
 }
 
-func (r *repository) GetSubscriptionsByShowId(ctx context.Context, showId string) (channelShowSubscriptions []m.DbChannelShowSubscription, err error) {
+func (r *repository) GetSubscriptionsByShowId(ctx context.Context, showId string, isEnabled bool) (channelShowSubscriptions []m.DbChannelShowSubscription, err error) {
 	channelShowSubscriptions = []m.DbChannelShowSubscription{}
-	iter := r.session.Query(queryGetSubscriptionsByShowId, showId).Iter()
+	iter := r.session.Query(queryGetSubscriptionsByShowId, showId, isEnabled).Iter()
 	if err != nil {
 		return []m.DbChannelShowSubscription{}, err
 	}

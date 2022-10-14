@@ -14,11 +14,11 @@ func (d *delivery) RunNotifier() {
 		for {
 			now := time.Now()
 			minute := now.Minute()
-			if minute%15 == 0 {
+			if minute%5 == 0 {
 				d.doNotifyLatestEpisodes()
 			}
 
-			time.Sleep(30 * time.Second)
+			time.Sleep(10 * time.Second)
 		}
 	}()
 }
