@@ -7,6 +7,7 @@ require (
 	github.com/andybalholm/cascadia v1.1.0 // indirect
 	github.com/bwmarrin/discordgo v0.26.1 // indirect
 	github.com/gocql/gocql v1.2.1 // indirect
+	github.com/golang-migrate/migrate v3.5.4+incompatible // indirect
 	github.com/golang/snappy v0.0.3 // indirect
 	github.com/gorilla/websocket v1.4.2 // indirect
 	github.com/hailocab/go-hostpool v0.0.0-20160125115350-e80d13ce29ed // indirect

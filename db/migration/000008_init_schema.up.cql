@@ -1,0 +1,1 @@
+CREATE INDEX channel_show_episode_notification_show_episode_id_idx on channelShowEpisodeNotification (showEpisodeId);

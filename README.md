@@ -29,6 +29,11 @@ Example configuration file
 
 ## Installation
 
+To migrate database, run this
+```bash
+make migrate-up db="cassandra://localhost:9042/example"
+```
+
 To use the livechart data grabber, run this
 ```bash
 make build-livechart && make run-livechart
