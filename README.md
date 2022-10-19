@@ -52,6 +52,10 @@ make build-bot && make run-bot
 
 /show-unsubscribe query:<show title> - To unsubscribe a show to a channel
 
+/headline-subscribe - To subscribe headlines to a channel
+
+/headline-unsubscribe - To unsubscribe headlines to a channel
+
 ## Contributing
 ```
 Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change.

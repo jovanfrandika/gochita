@@ -14,8 +14,8 @@ func (u *usecase) AddHandler(handler interface{}) {
 	(*u.discordBotRepo).AddHandler(handler)
 }
 
-func (u *usecase) GetSubscriptions(ctx context.Context, referenceId string) (content string, err error) {
-	dbSubscriptions, err := (*u.dbRepo).GetSubscriptionsByReferenceId(ctx, referenceId, true)
+func (u *usecase) GetShowSubscriptions(ctx context.Context, referenceId string) (content string, err error) {
+	dbSubscriptions, err := (*u.dbRepo).GetShowSubscriptionsByReferenceId(ctx, referenceId, true)
 	if err != nil {
 		return DEFAULT_ERROR, err
 	}
@@ -36,40 +36,98 @@ func (u *usecase) GetSubscriptions(ctx context.Context, referenceId string) (con
 	return content, nil
 }
 
-func (u *usecase) Subscribe(ctx context.Context, referenceId string, showTitle string) (content string, err error) {
+func (u *usecase) SubscribeShow(ctx context.Context, referenceId string, showTitle string) (content string, err error) {
 	dbShow, err := (*u.dbRepo).GetShowByTitle(ctx, showTitle)
 	if err != nil {
-		return fmt.Sprintf(LABEL_UNSUCCESS_SUBSCRIBED, showTitle), err
+		return fmt.Sprintf(LABEL_UNSUCCESS_SHOW_UNSUBSCRIPTION, showTitle), err
 	}
 
-	dbSubscription, err := (*u.dbRepo).GetSubscription(ctx, referenceId, dbShow.Id)
-	if err == gocql.ErrNotFound {
-		err = (*u.dbRepo).CreateSubscription(ctx, referenceId, dbShow.Id)
-	} else if !dbSubscription.IsEnabled {
-		err = (*u.dbRepo).ToggleSubscription(ctx, true, referenceId, dbShow.Id)
+	dbSubscription, err := (*u.dbRepo).GetShowSubscription(ctx, referenceId, dbShow.Id)
+	if err == gocql.ErrNotFound || !dbSubscription.IsEnabled {
+		err = (*u.dbRepo).ToggleShowSubscription(ctx, true, referenceId, dbShow.Id)
 	}
 	if err != nil {
-		return fmt.Sprintf(LABEL_UNSUCCESS_SUBSCRIBED, showTitle), err
+		return fmt.Sprintf(LABEL_UNSUCCESS_SHOW_SUBSCRIPTION, showTitle), err
 	}
 
-	return fmt.Sprintf(LABEL_SUCCESS_SUBSCRIBED, showTitle), nil
+	return fmt.Sprintf(LABEL_SUCCESS_SHOW_SUBSCRIPTION, showTitle), nil
 }
 
-func (u *usecase) Unsubscribe(ctx context.Context, referenceId string, showTitle string) (content string, err error) {
+func (u *usecase) SubscribeHeadline(ctx context.Context, referenceId string) (content string, err error) {
+	dbSubscription, err := (*u.dbRepo).GetHeadlineSubscription(ctx, referenceId)
+	if err == gocql.ErrNotFound || !dbSubscription.IsEnabled {
+		err = (*u.dbRepo).ToggleHeadlineSubscription(ctx, true, referenceId)
+	}
+	if err != nil {
+		return LABEL_UNSUCCESS_HEADLINE_SUBSCRIPTION, err
+	}
+
+	return LABEL_SUCCESS_HEADLINE_SUBSCRIPTION, nil
+}
+
+func (u *usecase) UnsubscribeShow(ctx context.Context, referenceId string, showTitle string) (content string, err error) {
 	dbShow, err := (*u.dbRepo).GetShowByTitle(ctx, showTitle)
 	if err != nil {
-		return fmt.Sprintf(LABEL_UNSUCCESS_UNSUBSCRIBED, showTitle), err
+		return fmt.Sprintf(LABEL_UNSUCCESS_SHOW_UNSUBSCRIPTION, showTitle), err
 	}
 
-	dbSubscription, _ := (*u.dbRepo).GetSubscription(ctx, referenceId, dbShow.Id)
+	dbSubscription, _ := (*u.dbRepo).GetShowSubscription(ctx, referenceId, dbShow.Id)
 	if dbSubscription.IsEnabled {
-		err = (*u.dbRepo).ToggleSubscription(ctx, false, referenceId, dbShow.Id)
+		err = (*u.dbRepo).ToggleShowSubscription(ctx, false, referenceId, dbShow.Id)
 	}
 	if err != nil {
-		return fmt.Sprintf(LABEL_UNSUCCESS_UNSUBSCRIBED, showTitle), err
+		return fmt.Sprintf(LABEL_UNSUCCESS_SHOW_UNSUBSCRIPTION, showTitle), err
 	}
 
-	return fmt.Sprintf(LABEL_SUCCESS_UNSUBSCRIBED, showTitle), nil
+	return fmt.Sprintf(LABEL_SUCCESS_SHOW_UNSUBSCRIPTION, showTitle), nil
+}
+
+func (u *usecase) UnsubscribeHeadline(ctx context.Context, referenceId string) (content string, err error) {
+	dbSubscription, _ := (*u.dbRepo).GetHeadlineSubscription(ctx, referenceId)
+	if err == gocql.ErrNotFound {
+		return LABEL_UNSUCCESS_HEADLINE_UNSUBSCRIPTION, err
+	}
+
+	if dbSubscription.IsEnabled {
+		err = (*u.dbRepo).ToggleHeadlineSubscription(ctx, false, referenceId)
+	}
+	if err != nil {
+		return LABEL_UNSUCCESS_HEADLINE_UNSUBSCRIPTION, err
+	}
+
+	return LABEL_SUCCESS_HEADLINE_UNSUBSCRIPTION, nil
+}
+
+func (u *usecase) NotifyNewHeadlines(ctx context.Context) (err error) {
+	now := time.Now()
+	dbLatestHeadlines, err := (*u.dbRepo).GetHeadlinesByRange(ctx, now.AddDate(0, 0, -1), now)
+	if err != nil {
+		return err
+	}
+
+	dbHeadlineSubscriptions, err := (*u.dbRepo).GetHeadlineSubscriptions(ctx)
+	if err != nil {
+		return err
+	}
+
+	for _, latestHeadline := range dbLatestHeadlines {
+		for _, subscriber := range dbHeadlineSubscriptions {
+			content := fmt.Sprintf(LABEL_NEW_HEADLINE, latestHeadline.Title, latestHeadline.PublishedAt.In(u.timeLocation).Format(time.RFC850), latestHeadline.Ref)
+			msg := &discordgo.MessageSend{
+				Content: content,
+			}
+			_, err := (*u.dbRepo).GetHeadlineNotification(ctx, subscriber.ReferenceId, latestHeadline.Id)
+			if err == gocql.ErrNotFound {
+				(*u.discordBotRepo).SendMsgToChannel(subscriber.ReferenceId, msg)
+				err = (*u.dbRepo).CreateHeadlineNotification(ctx, subscriber.ReferenceId, latestHeadline.Id)
+				if err != nil {
+					return err
+				}
+			}
+		}
+	}
+
+	return nil
 }
 
 func (u *usecase) NotifyNewEpisodes(ctx context.Context) (err error) {
@@ -91,7 +149,7 @@ func (u *usecase) NotifyNewEpisodes(ctx context.Context) (err error) {
 		}
 
 		if _, exists := showIdToChannelMap[latestEpisode.ShowId]; !exists {
-			dbChannelShowSubscriptions, err := (*u.dbRepo).GetSubscriptionsByShowId(ctx, latestEpisode.ShowId, true)
+			dbChannelShowSubscriptions, err := (*u.dbRepo).GetShowSubscriptionsByShowId(ctx, latestEpisode.ShowId, true)
 			if err != nil {
 				return err
 			}
@@ -100,9 +158,9 @@ func (u *usecase) NotifyNewEpisodes(ctx context.Context) (err error) {
 
 		var content string
 		if latestEpisode.Num != 0 {
-			content = fmt.Sprintf(LABEL_NEW_SERIES_EPISODE, showMap[latestEpisode.ShowId].Title, latestEpisode.Num, latestEpisode.PubDate.In(u.timeLocation).Format(time.RFC850))
+			content = fmt.Sprintf(LABEL_NEW_SHOW_SERIES_EPISODE, showMap[latestEpisode.ShowId].Title, latestEpisode.Num, latestEpisode.PubDate.In(u.timeLocation).Format(time.RFC850))
 		} else {
-			content = fmt.Sprintf(LABEL_NEW_MOVIE_EPISODE, showMap[latestEpisode.ShowId].Title, latestEpisode.PubDate.In(u.timeLocation).Format(time.RFC850))
+			content = fmt.Sprintf(LABEL_NEW_SHOW_MOVIE_EPISODE, showMap[latestEpisode.ShowId].Title, latestEpisode.PubDate.In(u.timeLocation).Format(time.RFC850))
 		}
 		msg := &discordgo.MessageSend{
 			Content: content,
@@ -116,10 +174,10 @@ func (u *usecase) NotifyNewEpisodes(ctx context.Context) (err error) {
 			},
 		}
 		for _, channel := range showIdToChannelMap[latestEpisode.ShowId] {
-			_, err := (*u.dbRepo).GetNotification(ctx, channel.ReferenceId, latestEpisode.ShowId)
+			_, err := (*u.dbRepo).GetShowNotification(ctx, channel.ReferenceId, latestEpisode.ShowId)
 			if err == gocql.ErrNotFound {
 				(*u.discordBotRepo).SendMsgToChannel(channel.ReferenceId, msg)
-				err = (*u.dbRepo).CreateNotification(ctx, channel.ReferenceId, latestEpisode.ShowId)
+				err = (*u.dbRepo).CreateShowNotification(ctx, channel.ReferenceId, latestEpisode.ShowId)
 				if err != nil {
 					return err
 				}

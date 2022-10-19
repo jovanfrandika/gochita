@@ -5,9 +5,11 @@ import "github.com/bwmarrin/discordgo"
 var (
 	QUERY = "query"
 
-	COMMAND_SHOW_LIST        = "show-list"
-	COMMAND_SHOW_SUBSCRIBE   = "show-subscribe"
-	COMMAND_SHOW_UNSUBSCRIBE = "show-unsubscribe"
+	COMMAND_SHOW_LIST            = "show-list"
+	COMMAND_SHOW_SUBSCRIBE       = "show-subscribe"
+	COMMAND_SHOW_UNSUBSCRIBE     = "show-unsubscribe"
+	COMMAND_HEADLINE_SUBSCRIBE   = "headline-subscribe"
+	COMMAND_HEADLINE_UNSUBSCRIBE = "headline-unsubscribe"
 
 	commands = []*discordgo.ApplicationCommand{
 		{
@@ -37,6 +39,14 @@ var (
 					Required:    true,
 				},
 			},
+		},
+		{
+			Name:        COMMAND_HEADLINE_SUBSCRIBE,
+			Description: "Subscribe to headlines",
+		},
+		{
+			Name:        COMMAND_HEADLINE_UNSUBSCRIBE,
+			Description: "Unsubscribe to headlines",
 		},
 	}
 )

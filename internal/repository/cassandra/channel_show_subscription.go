@@ -7,9 +7,9 @@ import (
 	m "github.com/jovanfrandika/livechart-notifier/domain"
 )
 
-func (r *repository) GetSubscriptionsByReferenceId(ctx context.Context, referenceId string, isEnabled bool) (channelShowSubscriptions []m.DbChannelShowSubscription, err error) {
+func (r *repository) GetShowSubscriptionsByReferenceId(ctx context.Context, referenceId string, isEnabled bool) (channelShowSubscriptions []m.DbChannelShowSubscription, err error) {
 	channelShowSubscriptions = []m.DbChannelShowSubscription{}
-	iter := r.session.Query(queryGetSubscriptionsByReferenceId, referenceId, isEnabled).Iter()
+	iter := r.session.Query(queryGetShowSubscriptionsByReferenceId, referenceId, isEnabled).Iter()
 	if err != nil {
 		return []m.DbChannelShowSubscription{}, err
 	}
@@ -24,9 +24,9 @@ func (r *repository) GetSubscriptionsByReferenceId(ctx context.Context, referenc
 	return channelShowSubscriptions, err
 }
 
-func (r *repository) GetSubscriptionsByShowId(ctx context.Context, showId string, isEnabled bool) (channelShowSubscriptions []m.DbChannelShowSubscription, err error) {
+func (r *repository) GetShowSubscriptionsByShowId(ctx context.Context, showId string, isEnabled bool) (channelShowSubscriptions []m.DbChannelShowSubscription, err error) {
 	channelShowSubscriptions = []m.DbChannelShowSubscription{}
-	iter := r.session.Query(queryGetSubscriptionsByShowId, showId, isEnabled).Iter()
+	iter := r.session.Query(queryGetShowSubscriptionsByShowId, showId, isEnabled).Iter()
 	if err != nil {
 		return []m.DbChannelShowSubscription{}, err
 	}
@@ -41,9 +41,9 @@ func (r *repository) GetSubscriptionsByShowId(ctx context.Context, showId string
 	return channelShowSubscriptions, err
 }
 
-func (r *repository) GetSubscription(ctx context.Context, referenceId, showId string) (channelShowSubscription m.DbChannelShowSubscription, err error) {
+func (r *repository) GetShowSubscription(ctx context.Context, referenceId, showId string) (channelShowSubscription m.DbChannelShowSubscription, err error) {
 	channelShowSubscription = m.DbChannelShowSubscription{}
-	err = r.session.Query(queryGetSubscription, referenceId, showId).Consistency(gocql.One).Scan(&channelShowSubscription.ReferenceId, &channelShowSubscription.ShowId, &channelShowSubscription.IsEnabled)
+	err = r.session.Query(queryGetShowSubscription, referenceId, showId).Consistency(gocql.One).Scan(&channelShowSubscription.ReferenceId, &channelShowSubscription.ShowId, &channelShowSubscription.IsEnabled)
 	if err != nil {
 		return m.DbChannelShowSubscription{}, err
 	}
@@ -51,12 +51,7 @@ func (r *repository) GetSubscription(ctx context.Context, referenceId, showId st
 	return channelShowSubscription, err
 }
 
-func (r *repository) CreateSubscription(ctx context.Context, referenceId, showId string) (err error) {
-	err = r.session.Query(queryCreateSubscription, referenceId, showId).Exec()
-	return err
-}
-
-func (r *repository) ToggleSubscription(ctx context.Context, isEnabled bool, referenceId, showId string) (err error) {
-	err = r.session.Query(queryToggleSubscription, isEnabled, referenceId, showId).Exec()
+func (r *repository) ToggleShowSubscription(ctx context.Context, isEnabled bool, referenceId, showId string) (err error) {
+	err = r.session.Query(queryToggleShowSubscription, isEnabled, referenceId, showId).Exec()
 	return err
 }

@@ -24,14 +24,24 @@ type Repository interface {
 	GetShowEpisodesByRange(ctx context.Context, start, end time.Time) (showEpisodes []m.DbShowEpisode, err error)
 	CreateShowEpisode(ctx context.Context, showId string, showEpisode m.FeedShowEpisode) (showEpisodeId string, err error)
 
-	GetSubscriptionsByReferenceId(ctx context.Context, referenceId string, isEnabled bool) (channelShowSubscriptions []m.DbChannelShowSubscription, err error)
-	GetSubscriptionsByShowId(ctx context.Context, showId string, isEnabled bool) (channelShowSubscriptions []m.DbChannelShowSubscription, err error)
-	GetSubscription(ctx context.Context, referenceId, showId string) (channelShowSubscription m.DbChannelShowSubscription, err error)
-	CreateSubscription(ctx context.Context, referenceId, showId string) (err error)
-	ToggleSubscription(ctx context.Context, isEnabled bool, referenceId, showId string) (err error)
+	GetShowSubscriptionsByReferenceId(ctx context.Context, referenceId string, isEnabled bool) (channelShowSubscriptions []m.DbChannelShowSubscription, err error)
+	GetShowSubscriptionsByShowId(ctx context.Context, showId string, isEnabled bool) (channelShowSubscriptions []m.DbChannelShowSubscription, err error)
+	GetShowSubscription(ctx context.Context, referenceId, showId string) (channelShowSubscription m.DbChannelShowSubscription, err error)
+	ToggleShowSubscription(ctx context.Context, isEnabled bool, referenceId, showId string) (err error)
 
-	GetNotification(ctx context.Context, showEpisodeId, referenceId string) (channelShowEpisodeNotification m.DbChannelShowEpisodeNotification, err error)
-	CreateNotification(ctx context.Context, showId, referenceId string) (err error)
+	GetShowNotification(ctx context.Context, showEpisodeId, referenceId string) (channelShowEpisodeNotification m.DbChannelShowEpisodeNotification, err error)
+	CreateShowNotification(ctx context.Context, showId, referenceId string) (err error)
+
+	GetHeadlinesByRange(ctx context.Context, start, end time.Time) (headlines []m.DbHeadline, err error)
+	GetHeadlineByTitle(ctx context.Context, title string) (headline m.DbHeadline, err error)
+	CreateHeadline(ctx context.Context, headline m.FeedHeadline) (headlineId string, err error)
+
+	GetHeadlineSubscriptions(ctx context.Context) (channelHeadlineSubscriptions []m.DbChannelHeadlineSubscription, err error)
+	GetHeadlineSubscription(ctx context.Context, referenceId string) (channelHeadlineSubscription m.DbChannelHeadlineSubscription, err error)
+	ToggleHeadlineSubscription(ctx context.Context, isEnabled bool, referenceId string) (err error)
+
+	GetHeadlineNotification(ctx context.Context, referenceId, headlineId string) (channelHeadlineNotification m.DbChannelHeadlineNotification, err error)
+	CreateHeadlineNotification(ctx context.Context, referenceId, headlineId string) (err error)
 }
 
 func New(clusters []string, keyspaceName string) Repository {

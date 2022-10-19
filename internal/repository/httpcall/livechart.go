@@ -69,3 +69,34 @@ func (r *repository) GetLatestEpisodes() (showMap map[string]m.FeedShow, err err
 
 	return showMap, nil
 }
+
+func (r *repository) GetLatestHeadlines() (headlineMap map[string]m.FeedHeadline, err error) {
+	resp, err := http.Get(r.baseUrl + uriLatestHeadlines)
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+
+	rss := m.Rss{}
+	decoder := xml.NewDecoder(resp.Body)
+	err = decoder.Decode(&rss)
+	if err != nil {
+		return nil, err
+	}
+
+	headlineMap = map[string]m.FeedHeadline{}
+	for _, item := range rss.Channel.Items {
+		if _, exists := headlineMap[item.Guid]; !exists {
+			pubDate, _ := time.Parse(time.RFC1123Z, item.PubDate)
+
+			headlineMap[item.Guid] = m.FeedHeadline{
+				Title:     item.Title,
+				Thumbnail: item.Enclosure.Url,
+				Ref:       item.Link,
+				PubDate:   pubDate.In(r.timeLocation),
+			}
+		}
+	}
+
+	return headlineMap, nil
+}

@@ -13,6 +13,7 @@ type repository struct {
 
 type Repository interface {
 	GetLatestEpisodes() (showMap map[string]m.FeedShow, err error)
+	GetLatestHeadlines() (headlineMap map[string]m.FeedHeadline, err error)
 }
 
 func New(baseUrl string, timeLocation *time.Location) Repository {

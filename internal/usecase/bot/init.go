@@ -17,10 +17,18 @@ type usecase struct {
 
 type Usecase interface {
 	AddHandler(handler interface{})
-	GetSubscriptions(ctx context.Context, referenceId string) (content string, err error)
-	Subscribe(ctx context.Context, referenceId string, showTitle string) (content string, err error)
-	Unsubscribe(ctx context.Context, referenceId string, showTitle string) (content string, err error)
+
+	GetShowSubscriptions(ctx context.Context, referenceId string) (content string, err error)
+
+	SubscribeShow(ctx context.Context, referenceId string, showTitle string) (content string, err error)
+	SubscribeHeadline(ctx context.Context, referenceId string) (content string, err error)
+
+	UnsubscribeShow(ctx context.Context, referenceId string, showTitle string) (content string, err error)
+	UnsubscribeHeadline(ctx context.Context, referenceId string) (content string, err error)
+
 	NotifyNewEpisodes(ctx context.Context) (err error)
+	NotifyNewHeadlines(ctx context.Context) (err error)
+
 	RegisterCommands(ctx context.Context, cmds []*discordgo.ApplicationCommand) (ccmds []*discordgo.ApplicationCommand, err error)
 	UnregisterCommands(ctx context.Context, cmds []*discordgo.ApplicationCommand) (err error)
 }

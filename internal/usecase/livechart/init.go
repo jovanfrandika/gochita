@@ -14,6 +14,7 @@ type usecase struct {
 
 type Usecase interface {
 	AddShowEpisodes(ctx context.Context) (err error)
+	AddHeadlines(ctx context.Context) (err error)
 }
 
 func New(dbRepo *rCassandra.Repository, client *rHttpcall.Repository) Usecase {

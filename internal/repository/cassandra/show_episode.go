@@ -42,7 +42,7 @@ func (r *repository) CreateShowEpisode(ctx context.Context, showId string, showE
 	if err != nil {
 		return "", err
 	}
-	showId = uuid.String()
+	showEpisodeId = uuid.String()
 
-	return showId, nil
+	return showEpisodeId, nil
 }

@@ -49,3 +49,19 @@ func (u *usecase) AddShowEpisodes(ctx context.Context) (err error) {
 
 	return nil
 }
+
+func (u *usecase) AddHeadlines(ctx context.Context) (err error) {
+	headlineMap, err := (*u.client).GetLatestHeadlines()
+	if err != nil {
+		return err
+	}
+
+	for _, headlineDetail := range headlineMap {
+		_, err := (*u.dbRepo).GetHeadlineByTitle(ctx, headlineDetail.Title)
+		if err == gocql.ErrNotFound {
+			_, err = (*u.dbRepo).CreateHeadline(ctx, headlineDetail)
+		}
+	}
+
+	return err
+}

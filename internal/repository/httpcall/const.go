@@ -5,5 +5,6 @@ import "time"
 const (
 	threeDays = 3 * 24 * time.Hour
 
-	uriLatestEpisodes = "/feeds/episodes"
+	uriLatestEpisodes  = "/feeds/episodes"
+	uriLatestHeadlines = "/feeds/headlines"
 )
