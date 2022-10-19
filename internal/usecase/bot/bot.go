@@ -3,6 +3,7 @@ package uBot
 import (
 	"context"
 	"fmt"
+	"log"
 	"time"
 
 	"github.com/bwmarrin/discordgo"
@@ -15,7 +16,7 @@ func (u *usecase) AddHandler(handler interface{}) {
 }
 
 func (u *usecase) GetShowSubscriptions(ctx context.Context, referenceId string) (content string, err error) {
-	dbSubscriptions, err := (*u.dbRepo).GetShowSubscriptionsByReferenceId(ctx, referenceId, true)
+	dbSubscriptions, err := (*u.dbRepo).GetSubscriptionsByReferenceId(ctx, SUBSCRIPTION_TYPE_SPECIFIC_SHOW, referenceId, true)
 	if err != nil {
 		return DEFAULT_ERROR, err
 	}
@@ -26,7 +27,7 @@ func (u *usecase) GetShowSubscriptions(ctx context.Context, referenceId string) 
 
 	content = "Subscriptions\n"
 	for idx, subscription := range dbSubscriptions {
-		dbShow, err := (*u.dbRepo).GetShowById(ctx, subscription.ShowId)
+		dbShow, err := (*u.dbRepo).GetShowById(ctx, subscription.ContextId)
 		if err != nil {
 			return DEFAULT_ERROR, err
 		}
@@ -36,109 +37,125 @@ func (u *usecase) GetShowSubscriptions(ctx context.Context, referenceId string) 
 	return content, nil
 }
 
-func (u *usecase) SubscribeShow(ctx context.Context, referenceId string, showTitle string) (content string, err error) {
-	dbShow, err := (*u.dbRepo).GetShowByTitle(ctx, showTitle)
-	if err != nil {
-		return fmt.Sprintf(LABEL_UNSUCCESS_SHOW_UNSUBSCRIPTION, showTitle), err
-	}
-
-	dbSubscription, err := (*u.dbRepo).GetShowSubscription(ctx, referenceId, dbShow.Id)
-	if err == gocql.ErrNotFound || !dbSubscription.IsEnabled {
-		err = (*u.dbRepo).ToggleShowSubscription(ctx, true, referenceId, dbShow.Id)
-	}
-	if err != nil {
-		return fmt.Sprintf(LABEL_UNSUCCESS_SHOW_SUBSCRIPTION, showTitle), err
-	}
-
-	return fmt.Sprintf(LABEL_SUCCESS_SHOW_SUBSCRIPTION, showTitle), nil
-}
-
-func (u *usecase) SubscribeHeadline(ctx context.Context, referenceId string) (content string, err error) {
-	dbSubscription, err := (*u.dbRepo).GetHeadlineSubscription(ctx, referenceId)
-	if err == gocql.ErrNotFound || !dbSubscription.IsEnabled {
-		err = (*u.dbRepo).ToggleHeadlineSubscription(ctx, true, referenceId)
-	}
-	if err != nil {
-		return LABEL_UNSUCCESS_HEADLINE_SUBSCRIPTION, err
-	}
-
-	return LABEL_SUCCESS_HEADLINE_SUBSCRIPTION, nil
-}
-
-func (u *usecase) UnsubscribeShow(ctx context.Context, referenceId string, showTitle string) (content string, err error) {
-	dbShow, err := (*u.dbRepo).GetShowByTitle(ctx, showTitle)
-	if err != nil {
-		return fmt.Sprintf(LABEL_UNSUCCESS_SHOW_UNSUBSCRIPTION, showTitle), err
-	}
-
-	dbSubscription, _ := (*u.dbRepo).GetShowSubscription(ctx, referenceId, dbShow.Id)
-	if dbSubscription.IsEnabled {
-		err = (*u.dbRepo).ToggleShowSubscription(ctx, false, referenceId, dbShow.Id)
-	}
-	if err != nil {
-		return fmt.Sprintf(LABEL_UNSUCCESS_SHOW_UNSUBSCRIPTION, showTitle), err
-	}
-
-	return fmt.Sprintf(LABEL_SUCCESS_SHOW_UNSUBSCRIPTION, showTitle), nil
-}
-
-func (u *usecase) UnsubscribeHeadline(ctx context.Context, referenceId string) (content string, err error) {
-	dbSubscription, _ := (*u.dbRepo).GetHeadlineSubscription(ctx, referenceId)
+func (u *usecase) SubscribeAllShow(ctx context.Context, referenceId string) (content string, err error) {
+	dbSubscription, err := (*u.dbRepo).GetSubscription(ctx, SUBSCRIPTION_TYPE_ALL_SHOW, referenceId, NO_CONTEXT_ID)
+	log.Println(err)
 	if err == gocql.ErrNotFound {
-		return LABEL_UNSUCCESS_HEADLINE_UNSUBSCRIPTION, err
+		err = (*u.dbRepo).CreateSubscription(ctx, SUBSCRIPTION_TYPE_ALL_SHOW, referenceId, NO_CONTEXT_ID)
+	} else if !dbSubscription.IsEnabled {
+		err = (*u.dbRepo).ToggleSubscription(ctx, true, SUBSCRIPTION_TYPE_ALL_SHOW, referenceId, NO_CONTEXT_ID)
+	}
+	if err != nil {
+		return LABEL_UNSUCCESS_ALL_SHOW_SUBSCRIPTION, err
+	}
+
+	return LABEL_SUCCESS_ALL_SHOW_SUBSCRIPTION, nil
+}
+
+func (u *usecase) SubscribeSpecificShow(ctx context.Context, referenceId string, showTitle string) (content string, err error) {
+	dbShow, err := (*u.dbRepo).GetShowByTitle(ctx, showTitle)
+	if err != nil {
+		return fmt.Sprintf(LABEL_UNSUCCESS_SPECIFIC_SHOW_SUBSCRIPTION, showTitle), err
+	}
+
+	dbSubscription, err := (*u.dbRepo).GetSubscription(ctx, SUBSCRIPTION_TYPE_SPECIFIC_SHOW, referenceId, dbShow.Id)
+	if err == gocql.ErrNotFound {
+		err = (*u.dbRepo).CreateSubscription(ctx, SUBSCRIPTION_TYPE_SPECIFIC_SHOW, referenceId, dbShow.Id)
+	} else if !dbSubscription.IsEnabled {
+		err = (*u.dbRepo).ToggleSubscription(ctx, true, SUBSCRIPTION_TYPE_SPECIFIC_SHOW, referenceId, dbShow.Id)
+	}
+	if err != nil {
+		return fmt.Sprintf(LABEL_UNSUCCESS_SPECIFIC_SHOW_SUBSCRIPTION, showTitle), err
+	}
+
+	return fmt.Sprintf(LABEL_SUCCESS_SPECIFIC_SHOW_SUBSCRIPTION, showTitle), nil
+}
+
+func (u *usecase) SubscribeAllHeadline(ctx context.Context, referenceId string) (content string, err error) {
+	dbSubscription, err := (*u.dbRepo).GetSubscription(ctx, SUBSCRIPTION_TYPE_ALL_HEADLINE, referenceId, NO_CONTEXT_ID)
+	if err == gocql.ErrNotFound {
+		err = (*u.dbRepo).CreateSubscription(ctx, SUBSCRIPTION_TYPE_ALL_HEADLINE, referenceId, NO_CONTEXT_ID)
+	} else if !dbSubscription.IsEnabled {
+		err = (*u.dbRepo).ToggleSubscription(ctx, true, SUBSCRIPTION_TYPE_ALL_HEADLINE, referenceId, NO_CONTEXT_ID)
+	}
+	if err != nil {
+		return LABEL_UNSUCCESS_ALL_HEADLINE_SUBSCRIPTION, err
+	}
+
+	return LABEL_SUCCESS_ALL_HEADLINE_SUBSCRIPTION, nil
+}
+
+func (u *usecase) UnsubscribeAllShow(ctx context.Context, referenceId string) (content string, err error) {
+	dbSubscription, _ := (*u.dbRepo).GetSubscription(ctx, SUBSCRIPTION_TYPE_ALL_SHOW, referenceId, NO_CONTEXT_ID)
+	if err == gocql.ErrNotFound {
+		return LABEL_UNSUCCESS_ALL_SHOW_UNSUBSCRIPTION, err
 	}
 
 	if dbSubscription.IsEnabled {
-		err = (*u.dbRepo).ToggleHeadlineSubscription(ctx, false, referenceId)
+		err = (*u.dbRepo).ToggleSubscription(ctx, false, SUBSCRIPTION_TYPE_ALL_SHOW, referenceId, NO_CONTEXT_ID)
 	}
 	if err != nil {
-		return LABEL_UNSUCCESS_HEADLINE_UNSUBSCRIPTION, err
+		return LABEL_UNSUCCESS_ALL_SHOW_UNSUBSCRIPTION, err
 	}
 
-	return LABEL_SUCCESS_HEADLINE_UNSUBSCRIPTION, nil
+	return LABEL_SUCCESS_ALL_SHOW_UNSUBSCRIPTION, nil
 }
 
-func (u *usecase) NotifyNewHeadlines(ctx context.Context) (err error) {
-	now := time.Now()
-	dbLatestHeadlines, err := (*u.dbRepo).GetHeadlinesByRange(ctx, now.AddDate(0, 0, -1), now)
+func (u *usecase) UnsubscribeSpecificShow(ctx context.Context, referenceId string, showTitle string) (content string, err error) {
+	dbShow, err := (*u.dbRepo).GetShowByTitle(ctx, showTitle)
 	if err != nil {
-		return err
+		return fmt.Sprintf(LABEL_UNSUCCESS_SPECIFIC_SHOW_SUBSCRIPTION, showTitle), err
 	}
 
-	dbHeadlineSubscriptions, err := (*u.dbRepo).GetHeadlineSubscriptions(ctx)
+	dbSubscription, _ := (*u.dbRepo).GetSubscription(ctx, SUBSCRIPTION_TYPE_SPECIFIC_SHOW, referenceId, dbShow.Id)
+	if dbSubscription.IsEnabled {
+		err = (*u.dbRepo).ToggleSubscription(ctx, false, SUBSCRIPTION_TYPE_SPECIFIC_SHOW, referenceId, dbShow.Id)
+	}
 	if err != nil {
-		return err
+		return fmt.Sprintf(LABEL_UNSUCCESS_SPECIFIC_SHOW_SUBSCRIPTION, showTitle), err
 	}
 
-	for _, latestHeadline := range dbLatestHeadlines {
-		for _, subscriber := range dbHeadlineSubscriptions {
-			content := fmt.Sprintf(LABEL_NEW_HEADLINE, latestHeadline.Title, latestHeadline.PublishedAt.In(u.timeLocation).Format(time.RFC850), latestHeadline.Ref)
-			msg := &discordgo.MessageSend{
-				Content: content,
-			}
-			_, err := (*u.dbRepo).GetHeadlineNotification(ctx, subscriber.ReferenceId, latestHeadline.Id)
-			if err == gocql.ErrNotFound {
-				(*u.discordBotRepo).SendMsgToChannel(subscriber.ReferenceId, msg)
-				err = (*u.dbRepo).CreateHeadlineNotification(ctx, subscriber.ReferenceId, latestHeadline.Id)
-				if err != nil {
-					return err
-				}
-			}
-		}
-	}
-
-	return nil
+	return fmt.Sprintf(LABEL_SUCCESS_SPECIFIC_SHOW_SUBSCRIPTION, showTitle), nil
 }
 
-func (u *usecase) NotifyNewEpisodes(ctx context.Context) (err error) {
+func (u *usecase) UnsubscribeAllHeadline(ctx context.Context, referenceId string) (content string, err error) {
+	dbSubscription, _ := (*u.dbRepo).GetSubscription(ctx, SUBSCRIPTION_TYPE_ALL_HEADLINE, referenceId, NO_CONTEXT_ID)
+	if dbSubscription.IsEnabled {
+		err = (*u.dbRepo).ToggleSubscription(ctx, false, SUBSCRIPTION_TYPE_ALL_HEADLINE, referenceId, NO_CONTEXT_ID)
+	}
+	if err != nil {
+		return LABEL_UNSUCCESS_ALL_HEADLINE_UNSUBSCRIPTION, err
+	}
+
+	return LABEL_SUCCESS_ALL_HEADLINE_UNSUBSCRIPTION, nil
+}
+
+func (u *usecase) NotifyNewShowEpisodes(ctx context.Context) (err error) {
 	now := time.Now()
 	dbLatestShowEpisodes, err := (*u.dbRepo).GetShowEpisodesByRange(ctx, now.AddDate(0, 0, -1), now)
 	if err != nil {
 		return err
 	}
 
+	dbAllShowSubscribers, err := (*u.dbRepo).GetSubscriptions(ctx, SUBSCRIPTION_TYPE_ALL_SHOW, true)
+	if err != nil {
+		return err
+	}
+
+	for _, latestEpisode := range dbLatestShowEpisodes {
+		for _, subscriber := range dbAllShowSubscribers {
+			_, err := (*u.dbRepo).GetSubscription(ctx, SUBSCRIPTION_TYPE_SPECIFIC_SHOW, subscriber.ReferenceId, latestEpisode.ShowId)
+			if err == gocql.ErrNotFound {
+				err = (*u.dbRepo).CreateSubscription(ctx, SUBSCRIPTION_TYPE_SPECIFIC_SHOW, subscriber.ReferenceId, latestEpisode.ShowId)
+			}
+			if err != nil {
+				return err
+			}
+		}
+	}
+
 	showMap := map[string]m.DbShow{}
-	showIdToChannelMap := map[string][]m.DbChannelShowSubscription{}
+	showIdToSubscriptionMap := map[string][]m.DbChannelSubscription{}
 	for _, latestEpisode := range dbLatestShowEpisodes {
 		if _, exists := showMap[latestEpisode.ShowId]; !exists {
 			dbShow, err := (*u.dbRepo).GetShowById(ctx, latestEpisode.ShowId)
@@ -148,12 +165,12 @@ func (u *usecase) NotifyNewEpisodes(ctx context.Context) (err error) {
 			showMap[latestEpisode.ShowId] = dbShow
 		}
 
-		if _, exists := showIdToChannelMap[latestEpisode.ShowId]; !exists {
-			dbChannelShowSubscriptions, err := (*u.dbRepo).GetShowSubscriptionsByShowId(ctx, latestEpisode.ShowId, true)
+		if _, exists := showIdToSubscriptionMap[latestEpisode.ShowId]; !exists {
+			dbChannelSubscriptions, err := (*u.dbRepo).GetSubscriptionsByContextId(ctx, SUBSCRIPTION_TYPE_SPECIFIC_SHOW, latestEpisode.ShowId, true)
 			if err != nil {
 				return err
 			}
-			showIdToChannelMap[latestEpisode.ShowId] = dbChannelShowSubscriptions
+			showIdToSubscriptionMap[latestEpisode.ShowId] = dbChannelSubscriptions
 		}
 
 		var content string
@@ -173,11 +190,43 @@ func (u *usecase) NotifyNewEpisodes(ctx context.Context) (err error) {
 				},
 			},
 		}
-		for _, channel := range showIdToChannelMap[latestEpisode.ShowId] {
-			_, err := (*u.dbRepo).GetShowNotification(ctx, channel.ReferenceId, latestEpisode.ShowId)
+		for _, subscriber := range showIdToSubscriptionMap[latestEpisode.ShowId] {
+			_, err := (*u.dbRepo).GetNotification(ctx, subscriber.Id)
 			if err == gocql.ErrNotFound {
-				(*u.discordBotRepo).SendMsgToChannel(channel.ReferenceId, msg)
-				err = (*u.dbRepo).CreateShowNotification(ctx, channel.ReferenceId, latestEpisode.ShowId)
+				(*u.discordBotRepo).SendMsgToChannel(subscriber.ReferenceId, msg)
+				err = (*u.dbRepo).CreateNotification(ctx, subscriber.Id)
+				if err != nil {
+					return err
+				}
+			}
+		}
+	}
+
+	return nil
+}
+
+func (u *usecase) NotifyNewHeadlines(ctx context.Context) (err error) {
+	now := time.Now()
+	dbLatestHeadlines, err := (*u.dbRepo).GetHeadlinesByRange(ctx, now.AddDate(0, 0, -1), now)
+	if err != nil {
+		return err
+	}
+
+	dbSubscriptions, err := (*u.dbRepo).GetSubscriptions(ctx, SUBSCRIPTION_TYPE_ALL_HEADLINE, true)
+	if err != nil {
+		return err
+	}
+
+	for _, latestHeadline := range dbLatestHeadlines {
+		for _, subscriber := range dbSubscriptions {
+			content := fmt.Sprintf(LABEL_NEW_HEADLINE, latestHeadline.Title, latestHeadline.PublishedAt.In(u.timeLocation).Format(time.RFC850), latestHeadline.Ref)
+			msg := &discordgo.MessageSend{
+				Content: content,
+			}
+			_, err := (*u.dbRepo).GetNotification(ctx, subscriber.Id)
+			if err == gocql.ErrNotFound {
+				(*u.discordBotRepo).SendMsgToChannel(subscriber.ReferenceId, msg)
+				err = (*u.dbRepo).CreateNotification(ctx, subscriber.Id)
 				if err != nil {
 					return err
 				}

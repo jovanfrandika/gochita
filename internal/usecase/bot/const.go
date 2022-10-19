@@ -7,18 +7,30 @@ const (
 
 	LABEL_SUBSCRIPTION_TITLE = "%v. %v\n"
 
-	LABEL_SUCCESS_SHOW_SUBSCRIPTION   = "%v successfully subscribed!"
-	LABEL_UNSUCCESS_SHOW_SUBSCRIPTION = "%v subscription failed :("
+	LABEL_SUCCESS_ALL_SHOW_SUBSCRIPTION   = "Successfully subscribed to new shows"
+	LABEL_UNSUCCESS_ALL_SHOW_SUBSCRIPTION = "Subscription failed :("
 
-	LABEL_SUCCESS_SHOW_UNSUBSCRIPTION   = "%v successfully unsubscribed!"
-	LABEL_UNSUCCESS_SHOW_UNSUBSCRIPTION = "%v unsubscription failed :("
+	LABEL_SUCCESS_ALL_SHOW_UNSUBSCRIPTION   = "Successfully unsubscribed to new shows"
+	LABEL_UNSUCCESS_ALL_SHOW_UNSUBSCRIPTION = "Unsubscription failed :("
 
-	LABEL_SUCCESS_HEADLINE_SUBSCRIPTION   = "Headline successfully subscribed!"
-	LABEL_UNSUCCESS_HEADLINE_SUBSCRIPTION = "Headline subscription failed :("
+	LABEL_SUCCESS_SPECIFIC_SHOW_SUBSCRIPTION   = "%v successfully subscribed!"
+	LABEL_UNSUCCESS_SPECIFIC_SHOW_SUBSCRIPTION = "%v subscription failed :("
 
-	LABEL_SUCCESS_HEADLINE_UNSUBSCRIPTION   = "successfully unsubscribed!"
-	LABEL_UNSUCCESS_HEADLINE_UNSUBSCRIPTION = "unsubscription failed :("
+	LABEL_SUCCESS_SPECIFIC_SHOW_UNSUBSCRIPTION   = "%v successfully unsubscribed!"
+	LABEL_UNSUCCESS_SPECIFIC_SHOW_UNSUBSCRIPTION = "%v unsubscription failed :("
+
+	LABEL_SUCCESS_ALL_HEADLINE_SUBSCRIPTION   = "Headlines successfully subscribed!"
+	LABEL_UNSUCCESS_ALL_HEADLINE_SUBSCRIPTION = "Headlines subscription failed :("
+
+	LABEL_SUCCESS_ALL_HEADLINE_UNSUBSCRIPTION   = "Headlines successfully unsubscribed!"
+	LABEL_UNSUCCESS_ALL_HEADLINE_UNSUBSCRIPTION = "Headlines unsubscription failed :("
 
 	NO_SUBSCRIPTIONS = "No subscriptions"
 	DEFAULT_ERROR    = "Oops something went wrong!"
+
+	SUBSCRIPTION_TYPE_ALL_SHOW      = 1
+	SUBSCRIPTION_TYPE_SPECIFIC_SHOW = 2
+	SUBSCRIPTION_TYPE_ALL_HEADLINE  = 3
+
+	NO_CONTEXT_ID = "00000000-0000-0000-0000-000000000000"
 )

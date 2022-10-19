@@ -1,1 +1,1 @@
-CREATE INDEX headline_title_idx on headline (title);
+CREATE INDEX headline_published_at_idx on headline (published_at);

@@ -20,13 +20,15 @@ type Usecase interface {
 
 	GetShowSubscriptions(ctx context.Context, referenceId string) (content string, err error)
 
-	SubscribeShow(ctx context.Context, referenceId string, showTitle string) (content string, err error)
-	SubscribeHeadline(ctx context.Context, referenceId string) (content string, err error)
+	SubscribeAllShow(ctx context.Context, referenceId string) (content string, err error)
+	SubscribeSpecificShow(ctx context.Context, referenceId string, showTitle string) (content string, err error)
+	SubscribeAllHeadline(ctx context.Context, referenceId string) (content string, err error)
 
-	UnsubscribeShow(ctx context.Context, referenceId string, showTitle string) (content string, err error)
-	UnsubscribeHeadline(ctx context.Context, referenceId string) (content string, err error)
+	UnsubscribeAllShow(ctx context.Context, referenceId string) (content string, err error)
+	UnsubscribeSpecificShow(ctx context.Context, referenceId string, showTitle string) (content string, err error)
+	UnsubscribeAllHeadline(ctx context.Context, referenceId string) (content string, err error)
 
-	NotifyNewEpisodes(ctx context.Context) (err error)
+	NotifyNewShowEpisodes(ctx context.Context) (err error)
 	NotifyNewHeadlines(ctx context.Context) (err error)
 
 	RegisterCommands(ctx context.Context, cmds []*discordgo.ApplicationCommand) (ccmds []*discordgo.ApplicationCommand, err error)

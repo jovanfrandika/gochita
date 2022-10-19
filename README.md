@@ -48,13 +48,17 @@ make build-bot && make run-bot
 
 /show-list - To show channel's subscribed show
 
+/show-subscribe-all - To subscribe new shows to a channel
+
+/show-unsubscribe-all - To unsubscribe new shows to a channel
+
 /show-subscribe query:<show title> - To subscribe a show to a channel
 
 /show-unsubscribe query:<show title> - To unsubscribe a show to a channel
 
-/headline-subscribe - To subscribe headlines to a channel
+/headline-subscribe-all - To subscribe new headlines to a channel
 
-/headline-unsubscribe - To unsubscribe headlines to a channel
+/headline-unsubscribe-all - To unsubscribe new headlines to a channel
 
 ## Contributing
 ```
