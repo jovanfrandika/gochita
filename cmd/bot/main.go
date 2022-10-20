@@ -7,11 +7,11 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/jovanfrandika/livechart-notifier/config"
-	dBot "github.com/jovanfrandika/livechart-notifier/internal/delivery/bot"
-	rCassandra "github.com/jovanfrandika/livechart-notifier/internal/repository/cassandra"
-	rDiscord "github.com/jovanfrandika/livechart-notifier/internal/repository/discord"
-	uBot "github.com/jovanfrandika/livechart-notifier/internal/usecase/bot"
+	"github.com/jovanfrandika/gochita/config"
+	dBot "github.com/jovanfrandika/gochita/internal/delivery/bot"
+	rCassandra "github.com/jovanfrandika/gochita/internal/repository/cassandra"
+	rDiscord "github.com/jovanfrandika/gochita/internal/repository/discord"
+	uBot "github.com/jovanfrandika/gochita/internal/usecase/bot"
 )
 
 func main() {

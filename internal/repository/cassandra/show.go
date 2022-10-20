@@ -4,7 +4,7 @@ import (
 	"context"
 
 	"github.com/gocql/gocql"
-	m "github.com/jovanfrandika/livechart-notifier/domain"
+	m "github.com/jovanfrandika/gochita/domain"
 )
 
 func (r *repository) GetShowById(ctx context.Context, showId string) (show m.DbShow, err error) {

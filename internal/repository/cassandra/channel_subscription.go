@@ -4,7 +4,7 @@ import (
 	"context"
 
 	"github.com/gocql/gocql"
-	m "github.com/jovanfrandika/livechart-notifier/domain"
+	m "github.com/jovanfrandika/gochita/domain"
 )
 
 func (r *repository) GetSubscriptionsByReferenceId(ctx context.Context, subscriptionType int, referenceId string, isEnabled bool) (channelSubscriptions []m.DbChannelSubscription, err error) {

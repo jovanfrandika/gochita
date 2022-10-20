@@ -5,7 +5,7 @@ import (
 	"time"
 
 	"github.com/gocql/gocql"
-	m "github.com/jovanfrandika/livechart-notifier/domain"
+	m "github.com/jovanfrandika/gochita/domain"
 )
 
 func (r *repository) GetShowEpisodesByShowId(ctx context.Context, showId string) (showEpisodes []m.DbShowEpisode, err error) {

@@ -7,7 +7,7 @@ import (
 	"os"
 	"path/filepath"
 
-	m "github.com/jovanfrandika/livechart-notifier/domain"
+	m "github.com/jovanfrandika/gochita/domain"
 )
 
 func Init() (cfg *m.Config) {

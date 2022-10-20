@@ -1,4 +1,4 @@
-module github.com/jovanfrandika/livechart-notifier
+module github.com/jovanfrandika/gochita
 
 go 1.18
 

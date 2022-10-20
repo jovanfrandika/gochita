@@ -2,7 +2,7 @@ package dBot
 
 import (
 	"github.com/bwmarrin/discordgo"
-	uBot "github.com/jovanfrandika/livechart-notifier/internal/usecase/bot"
+	uBot "github.com/jovanfrandika/gochita/internal/usecase/bot"
 )
 
 type delivery struct {

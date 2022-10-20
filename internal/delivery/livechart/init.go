@@ -1,6 +1,6 @@
 package dLivechart
 
-import uLivechart "github.com/jovanfrandika/livechart-notifier/internal/usecase/livechart"
+import uLivechart "github.com/jovanfrandika/gochita/internal/usecase/livechart"
 
 type delivery struct {
 	usecase *uLivechart.Usecase

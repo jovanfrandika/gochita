@@ -1,8 +1,12 @@
-# Judah
+# Gochita
 
-Judah is a discord bot for notifying latest published Anime Series/Movies to your discord channel.
+<p align="center">
+  <img src="files/images/gochita.png" alt="gochita" width="200" style="padding: 32px 0;" />
+</p>
 
-Judah stores livechart RSS feed that into a CassandraDB under the hood.
+Gochita is a discord bot for notifying latest published Anime Series/Movies and headlines to your dedicated discord channel.
+
+Gochita stores livechart RSS feed that into a CassandraDB under the hood.
 
 ## Configuration
 
@@ -59,6 +63,11 @@ make build-bot && make run-bot
 /headline-subscribe-all - To subscribe new headlines to a channel
 
 /headline-unsubscribe-all - To unsubscribe new headlines to a channel
+
+# Roadmap
+
+- Make use of discord slash subcommands
+- Notify new manga update
 
 ## Contributing
 ```

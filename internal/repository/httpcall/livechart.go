@@ -9,7 +9,7 @@ import (
 	"strings"
 	"time"
 
-	m "github.com/jovanfrandika/livechart-notifier/domain"
+	m "github.com/jovanfrandika/gochita/domain"
 )
 
 func (r *repository) GetLatestEpisodes() (showMap map[string]m.FeedShow, err error) {

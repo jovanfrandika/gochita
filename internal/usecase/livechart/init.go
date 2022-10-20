@@ -3,8 +3,8 @@ package uLivechart
 import (
 	"context"
 
-	rCassandra "github.com/jovanfrandika/livechart-notifier/internal/repository/cassandra"
-	rHttpcall "github.com/jovanfrandika/livechart-notifier/internal/repository/httpcall"
+	rCassandra "github.com/jovanfrandika/gochita/internal/repository/cassandra"
+	rHttpcall "github.com/jovanfrandika/gochita/internal/repository/httpcall"
 )
 
 type usecase struct {

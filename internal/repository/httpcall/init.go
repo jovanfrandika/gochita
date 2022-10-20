@@ -3,7 +3,7 @@ package rHttpcall
 import (
 	"time"
 
-	m "github.com/jovanfrandika/livechart-notifier/domain"
+	m "github.com/jovanfrandika/gochita/domain"
 )
 
 type repository struct {

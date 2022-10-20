@@ -5,8 +5,8 @@ import (
 	"time"
 
 	"github.com/bwmarrin/discordgo"
-	rCassandra "github.com/jovanfrandika/livechart-notifier/internal/repository/cassandra"
-	rDiscord "github.com/jovanfrandika/livechart-notifier/internal/repository/discord"
+	rCassandra "github.com/jovanfrandika/gochita/internal/repository/cassandra"
+	rDiscord "github.com/jovanfrandika/gochita/internal/repository/discord"
 )
 
 type usecase struct {
