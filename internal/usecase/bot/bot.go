@@ -37,19 +37,19 @@ func (u *usecase) GetShowSubscriptions(ctx context.Context, referenceId string) 
 	return content, nil
 }
 
-func (u *usecase) SubscribeAllShow(ctx context.Context, referenceId string) (content string, err error) {
-	dbSubscription, err := (*u.dbRepo).GetSubscription(ctx, SUBSCRIPTION_TYPE_ALL_SHOW, referenceId, NO_CONTEXT_ID)
+func (u *usecase) SubscribeNewShow(ctx context.Context, referenceId string) (content string, err error) {
+	dbSubscription, err := (*u.dbRepo).GetSubscription(ctx, SUBSCRIPTION_TYPE_NEW_SHOW, referenceId, NO_CONTEXT_ID)
 	log.Println(err)
 	if err == gocql.ErrNotFound {
-		_, err = (*u.dbRepo).CreateSubscription(ctx, SUBSCRIPTION_TYPE_ALL_SHOW, referenceId, NO_CONTEXT_ID)
+		_, err = (*u.dbRepo).CreateSubscription(ctx, SUBSCRIPTION_TYPE_NEW_SHOW, referenceId, NO_CONTEXT_ID)
 	} else if !dbSubscription.IsEnabled {
-		err = (*u.dbRepo).ToggleSubscription(ctx, true, SUBSCRIPTION_TYPE_ALL_SHOW, referenceId, NO_CONTEXT_ID)
+		err = (*u.dbRepo).ToggleSubscription(ctx, true, SUBSCRIPTION_TYPE_NEW_SHOW, referenceId, NO_CONTEXT_ID)
 	}
 	if err != nil {
-		return LABEL_UNSUCCESS_ALL_SHOW_SUBSCRIPTION, err
+		return LABEL_UNSUCCESS_NEW_SHOW_SUBSCRIPTION, err
 	}
 
-	return LABEL_SUCCESS_ALL_SHOW_SUBSCRIPTION, nil
+	return LABEL_SUCCESS_NEW_SHOW_SUBSCRIPTION, nil
 }
 
 func (u *usecase) SubscribeSpecificShow(ctx context.Context, referenceId string, showTitle string) (content string, err error) {
@@ -71,34 +71,34 @@ func (u *usecase) SubscribeSpecificShow(ctx context.Context, referenceId string,
 	return fmt.Sprintf(LABEL_SUCCESS_SPECIFIC_SHOW_SUBSCRIPTION, showTitle), nil
 }
 
-func (u *usecase) SubscribeAllHeadline(ctx context.Context, referenceId string) (content string, err error) {
-	dbSubscription, err := (*u.dbRepo).GetSubscription(ctx, SUBSCRIPTION_TYPE_ALL_HEADLINE, referenceId, NO_CONTEXT_ID)
+func (u *usecase) SubscribeNewHeadline(ctx context.Context, referenceId string) (content string, err error) {
+	dbSubscription, err := (*u.dbRepo).GetSubscription(ctx, SUBSCRIPTION_TYPE_NEW_HEADLINE, referenceId, NO_CONTEXT_ID)
 	if err == gocql.ErrNotFound {
-		_, err = (*u.dbRepo).CreateSubscription(ctx, SUBSCRIPTION_TYPE_ALL_HEADLINE, referenceId, NO_CONTEXT_ID)
+		_, err = (*u.dbRepo).CreateSubscription(ctx, SUBSCRIPTION_TYPE_NEW_HEADLINE, referenceId, NO_CONTEXT_ID)
 	} else if !dbSubscription.IsEnabled {
-		err = (*u.dbRepo).ToggleSubscription(ctx, true, SUBSCRIPTION_TYPE_ALL_HEADLINE, referenceId, NO_CONTEXT_ID)
+		err = (*u.dbRepo).ToggleSubscription(ctx, true, SUBSCRIPTION_TYPE_NEW_HEADLINE, referenceId, NO_CONTEXT_ID)
 	}
 	if err != nil {
-		return LABEL_UNSUCCESS_ALL_HEADLINE_SUBSCRIPTION, err
+		return LABEL_UNSUCCESS_NEW_HEADLINE_SUBSCRIPTION, err
 	}
 
-	return LABEL_SUCCESS_ALL_HEADLINE_SUBSCRIPTION, nil
+	return LABEL_SUCCESS_NEW_HEADLINE_SUBSCRIPTION, nil
 }
 
-func (u *usecase) UnsubscribeAllShow(ctx context.Context, referenceId string) (content string, err error) {
-	dbSubscription, _ := (*u.dbRepo).GetSubscription(ctx, SUBSCRIPTION_TYPE_ALL_SHOW, referenceId, NO_CONTEXT_ID)
+func (u *usecase) UnsubscribeNewShow(ctx context.Context, referenceId string) (content string, err error) {
+	dbSubscription, _ := (*u.dbRepo).GetSubscription(ctx, SUBSCRIPTION_TYPE_NEW_SHOW, referenceId, NO_CONTEXT_ID)
 	if err == gocql.ErrNotFound {
-		return LABEL_UNSUCCESS_ALL_SHOW_UNSUBSCRIPTION, err
+		return LABEL_UNSUCCESS_NEW_SHOW_UNSUBSCRIPTION, err
 	}
 
 	if dbSubscription.IsEnabled {
-		err = (*u.dbRepo).ToggleSubscription(ctx, false, SUBSCRIPTION_TYPE_ALL_SHOW, referenceId, NO_CONTEXT_ID)
+		err = (*u.dbRepo).ToggleSubscription(ctx, false, SUBSCRIPTION_TYPE_NEW_SHOW, referenceId, NO_CONTEXT_ID)
 	}
 	if err != nil {
-		return LABEL_UNSUCCESS_ALL_SHOW_UNSUBSCRIPTION, err
+		return LABEL_UNSUCCESS_NEW_SHOW_UNSUBSCRIPTION, err
 	}
 
-	return LABEL_SUCCESS_ALL_SHOW_UNSUBSCRIPTION, nil
+	return LABEL_SUCCESS_NEW_SHOW_UNSUBSCRIPTION, nil
 }
 
 func (u *usecase) UnsubscribeSpecificShow(ctx context.Context, referenceId string, showTitle string) (content string, err error) {
@@ -118,16 +118,16 @@ func (u *usecase) UnsubscribeSpecificShow(ctx context.Context, referenceId strin
 	return fmt.Sprintf(LABEL_SUCCESS_SPECIFIC_SHOW_UNSUBSCRIPTION, showTitle), nil
 }
 
-func (u *usecase) UnsubscribeAllHeadline(ctx context.Context, referenceId string) (content string, err error) {
-	dbSubscription, _ := (*u.dbRepo).GetSubscription(ctx, SUBSCRIPTION_TYPE_ALL_HEADLINE, referenceId, NO_CONTEXT_ID)
+func (u *usecase) UnsubscribeNewHeadline(ctx context.Context, referenceId string) (content string, err error) {
+	dbSubscription, _ := (*u.dbRepo).GetSubscription(ctx, SUBSCRIPTION_TYPE_NEW_HEADLINE, referenceId, NO_CONTEXT_ID)
 	if dbSubscription.IsEnabled {
-		err = (*u.dbRepo).ToggleSubscription(ctx, false, SUBSCRIPTION_TYPE_ALL_HEADLINE, referenceId, NO_CONTEXT_ID)
+		err = (*u.dbRepo).ToggleSubscription(ctx, false, SUBSCRIPTION_TYPE_NEW_HEADLINE, referenceId, NO_CONTEXT_ID)
 	}
 	if err != nil {
-		return LABEL_UNSUCCESS_ALL_HEADLINE_UNSUBSCRIPTION, err
+		return LABEL_UNSUCCESS_NEW_HEADLINE_UNSUBSCRIPTION, err
 	}
 
-	return LABEL_SUCCESS_ALL_HEADLINE_UNSUBSCRIPTION, nil
+	return LABEL_SUCCESS_NEW_HEADLINE_UNSUBSCRIPTION, nil
 }
 
 func (u *usecase) NotifyNewShowEpisodes(ctx context.Context) (err error) {
@@ -137,13 +137,13 @@ func (u *usecase) NotifyNewShowEpisodes(ctx context.Context) (err error) {
 		return err
 	}
 
-	dbAllShowSubscribers, err := (*u.dbRepo).GetSubscriptions(ctx, SUBSCRIPTION_TYPE_ALL_SHOW, true)
+	dbNewShowSubscribers, err := (*u.dbRepo).GetSubscriptions(ctx, SUBSCRIPTION_TYPE_NEW_SHOW, true)
 	if err != nil {
 		return err
 	}
 
 	for _, latestEpisode := range dbLatestShowEpisodes {
-		for _, subscriber := range dbAllShowSubscribers {
+		for _, subscriber := range dbNewShowSubscribers {
 			_, err := (*u.dbRepo).GetSubscription(ctx, SUBSCRIPTION_TYPE_SPECIFIC_SHOW, subscriber.ReferenceId, latestEpisode.ShowId)
 			if err == gocql.ErrNotFound {
 				_, err = (*u.dbRepo).CreateSubscription(ctx, SUBSCRIPTION_TYPE_SPECIFIC_SHOW, subscriber.ReferenceId, latestEpisode.ShowId)
@@ -212,7 +212,7 @@ func (u *usecase) NotifyNewHeadlines(ctx context.Context) (err error) {
 		return err
 	}
 
-	dbSubscriptions, err := (*u.dbRepo).GetSubscriptions(ctx, SUBSCRIPTION_TYPE_ALL_HEADLINE, true)
+	dbSubscriptions, err := (*u.dbRepo).GetSubscriptions(ctx, SUBSCRIPTION_TYPE_NEW_HEADLINE, true)
 	if err != nil {
 		return err
 	}

@@ -50,23 +50,22 @@ make build-bot && make run-bot
 
 ## Commands
 
-/show-list - To show channel's subscribed show
+/show list - To show channel's subscribed show
 
-/show-subscribe-all - To subscribe new shows to a channel
+/show subscribe all - To subscribe new shows to a channel
 
-/show-unsubscribe-all - To unsubscribe new shows to a channel
+/show unsubscribe all - To unsubscribe new shows to a channel
 
-/show-subscribe query:<show title> - To subscribe a show to a channel
+/show subscribe one query:<show title> - To subscribe a show to a channel
 
-/show-unsubscribe query:<show title> - To unsubscribe a show to a channel
+/show unsubscribe one query:<show title> - To unsubscribe a show to a channel
 
-/headline-subscribe-all - To subscribe new headlines to a channel
+/headline subscribe all - To subscribe new headlines to a channel
 
-/headline-unsubscribe-all - To unsubscribe new headlines to a channel
+/headline unsubscribe all - To unsubscribe new headlines to a channel
 
 # Roadmap
 
-- Make use of discord slash subcommands
 - Notify new manga update
 
 ## Contributing

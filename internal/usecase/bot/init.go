@@ -20,13 +20,13 @@ type Usecase interface {
 
 	GetShowSubscriptions(ctx context.Context, referenceId string) (content string, err error)
 
-	SubscribeAllShow(ctx context.Context, referenceId string) (content string, err error)
+	SubscribeNewShow(ctx context.Context, referenceId string) (content string, err error)
 	SubscribeSpecificShow(ctx context.Context, referenceId string, showTitle string) (content string, err error)
-	SubscribeAllHeadline(ctx context.Context, referenceId string) (content string, err error)
+	SubscribeNewHeadline(ctx context.Context, referenceId string) (content string, err error)
 
-	UnsubscribeAllShow(ctx context.Context, referenceId string) (content string, err error)
+	UnsubscribeNewShow(ctx context.Context, referenceId string) (content string, err error)
 	UnsubscribeSpecificShow(ctx context.Context, referenceId string, showTitle string) (content string, err error)
-	UnsubscribeAllHeadline(ctx context.Context, referenceId string) (content string, err error)
+	UnsubscribeNewHeadline(ctx context.Context, referenceId string) (content string, err error)
 
 	NotifyNewShowEpisodes(ctx context.Context) (err error)
 	NotifyNewHeadlines(ctx context.Context) (err error)

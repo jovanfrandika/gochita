@@ -38,26 +38,58 @@ func (d *delivery) RunNotifier() {
 func (d *delivery) InitHandler() {
 	(*d.usecase).AddHandler(func(s *discordgo.Session, i *discordgo.InteractionCreate) {
 		switch command := i.ApplicationCommandData().Name; command {
-		case COMMAND_SHOW_LIST:
-			d.getShowSubscriptions(s, i)
-		case COMMAND_SHOW_SUBSCRIBE_ALL:
-			d.subscribeAllShow(s, i)
-		case COMMAND_SHOW_UNSUBSCRIBE_ALL:
-			d.unsubscribeAllShow(s, i)
-		case COMMAND_SHOW_SUBSCRIBE:
-			d.subscribeSpecificShow(s, i)
-		case COMMAND_SHOW_UNSUBSCRIBE:
-			d.unsubscribeSpecificShow(s, i)
-		case COMMAND_HEADLINE_SUBSCRIBE_ALL:
-			d.subscribeAllHeadline(s, i)
-		case COMMAND_HEADLINE_UNSUBSCRIBE_ALL:
-			d.unsubscribeAllHeadline(s, i)
+		case COMMAND_SHOW:
+			options := i.ApplicationCommandData().Options
+			switch options[0].Name {
+			case SUBCOMMAND_LIST:
+				d.getShowSubscriptions(s, i)
+			case SUBCOMMAND_SUBSCRIBE:
+				options = options[0].Options
+				switch options[0].Name {
+				case SUBCOMMAND_NEW:
+					d.subscribeNewShow(s, i)
+				case SUBCOMMAND_ONE:
+					d.unsubscribeSpecificShow(s, i)
+				default:
+				}
+			case SUBCOMMAND_UNSUBSCRIBE:
+				options = options[0].Options
+				switch options[0].Name {
+				case SUBCOMMAND_NEW:
+					d.unsubscribeNewShow(s, i)
+				case SUBCOMMAND_ONE:
+					d.unsubscribeSpecificShow(s, i)
+				default:
+				}
+			default:
+			}
+		case COMMAND_HEADLINE:
+			options := i.ApplicationCommandData().Options
+			switch options[0].Name {
+			case SUBCOMMAND_SUBSCRIBE:
+				options = options[0].Options
+
+				switch options[0].Name {
+				case SUBCOMMAND_NEW:
+					d.subscribeNewHeadline(s, i)
+				default:
+				}
+			case SUBCOMMAND_UNSUBSCRIBE:
+				options = options[0].Options
+
+				switch options[0].Name {
+				case SUBCOMMAND_NEW:
+					d.unsubscribeNewHeadline(s, i)
+				default:
+				}
+			default:
+			}
 		default:
 		}
 	})
 }
 
-func (d *delivery) subscribeAllShow(s *discordgo.Session, i *discordgo.InteractionCreate) {
+func (d *delivery) subscribeNewShow(s *discordgo.Session, i *discordgo.InteractionCreate) {
 	now := time.Now()
 	ctx, cancel := context.WithTimeout(context.Background(), 1*time.Second)
 	defer cancel()
@@ -66,7 +98,7 @@ func (d *delivery) subscribeAllShow(s *discordgo.Session, i *discordgo.Interacti
 	var err error
 	ch := make(chan int)
 	go func() {
-		content, err = (*d.usecase).SubscribeAllShow(ctx, i.ChannelID)
+		content, err = (*d.usecase).SubscribeNewShow(ctx, i.ChannelID)
 		ch <- 1
 	}()
 
@@ -87,7 +119,7 @@ func (d *delivery) subscribeAllShow(s *discordgo.Session, i *discordgo.Interacti
 	})
 }
 
-func (d *delivery) unsubscribeAllShow(s *discordgo.Session, i *discordgo.InteractionCreate) {
+func (d *delivery) unsubscribeNewShow(s *discordgo.Session, i *discordgo.InteractionCreate) {
 	now := time.Now()
 	ctx, cancel := context.WithTimeout(context.Background(), 1*time.Second)
 	defer cancel()
@@ -96,7 +128,7 @@ func (d *delivery) unsubscribeAllShow(s *discordgo.Session, i *discordgo.Interac
 	var err error
 	ch := make(chan int)
 	go func() {
-		content, err = (*d.usecase).UnsubscribeAllShow(ctx, i.ChannelID)
+		content, err = (*d.usecase).UnsubscribeNewShow(ctx, i.ChannelID)
 		ch <- 1
 	}()
 
@@ -217,7 +249,7 @@ func (d *delivery) unsubscribeSpecificShow(s *discordgo.Session, i *discordgo.In
 	})
 }
 
-func (d *delivery) subscribeAllHeadline(s *discordgo.Session, i *discordgo.InteractionCreate) {
+func (d *delivery) subscribeNewHeadline(s *discordgo.Session, i *discordgo.InteractionCreate) {
 	now := time.Now()
 	ctx, cancel := context.WithTimeout(context.Background(), 1*time.Second)
 	defer cancel()
@@ -226,7 +258,7 @@ func (d *delivery) subscribeAllHeadline(s *discordgo.Session, i *discordgo.Inter
 	var err error
 	ch := make(chan int)
 	go func() {
-		content, err = (*d.usecase).SubscribeAllHeadline(ctx, i.ChannelID)
+		content, err = (*d.usecase).SubscribeNewHeadline(ctx, i.ChannelID)
 		ch <- 1
 	}()
 
@@ -247,7 +279,7 @@ func (d *delivery) subscribeAllHeadline(s *discordgo.Session, i *discordgo.Inter
 	})
 }
 
-func (d *delivery) unsubscribeAllHeadline(s *discordgo.Session, i *discordgo.InteractionCreate) {
+func (d *delivery) unsubscribeNewHeadline(s *discordgo.Session, i *discordgo.InteractionCreate) {
 	now := time.Now()
 	ctx, cancel := context.WithTimeout(context.Background(), 1*time.Second)
 	defer cancel()
@@ -256,7 +288,7 @@ func (d *delivery) unsubscribeAllHeadline(s *discordgo.Session, i *discordgo.Int
 	var err error
 	ch := make(chan int)
 	go func() {
-		content, err = (*d.usecase).UnsubscribeAllHeadline(ctx, i.ChannelID)
+		content, err = (*d.usecase).UnsubscribeNewHeadline(ctx, i.ChannelID)
 		ch <- 1
 	}()
 
