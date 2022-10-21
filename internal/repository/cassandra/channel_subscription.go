@@ -68,9 +68,14 @@ func (r *repository) GetSubscription(ctx context.Context, subscriptionType int, 
 	return channelSubscription, err
 }
 
-func (r *repository) CreateSubscription(ctx context.Context, subscriptionType int, referenceId, contextId string) (err error) {
-	err = r.session.Query(queryCreateSubscription, gocql.TimeUUID(), subscriptionType, referenceId, contextId).Exec()
-	return err
+func (r *repository) CreateSubscription(ctx context.Context, subscriptionType int, referenceId, contextId string) (channelSubscriptionId string, err error) {
+	uuid := gocql.TimeUUID()
+	err = r.session.Query(queryCreateSubscription, uuid, subscriptionType, referenceId, contextId).Exec()
+	if err != nil {
+		return "", err
+	}
+	channelSubscriptionId = uuid.String()
+	return channelSubscriptionId, err
 }
 
 func (r *repository) ToggleSubscription(ctx context.Context, isEnabled bool, subscriptionType int, referenceId, contextId string) (err error) {
