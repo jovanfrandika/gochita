@@ -104,4 +104,23 @@ const (
 		INSERT INTO headline (id, title, thumbnail, ref, published_at)
 		VALUES (?, ?, ?, ?, ?)
 	`
+
+	// MangaPost
+	queryGetMangaPostsByRange = `
+		SELECT id, title, ref, published_at
+		FROM manga_post
+		WHERE published_at >= ? AND published_at <= ? 
+		LIMIT 100
+		ALLOW FILTERING
+	`
+	queryGetMangaPostByTitle = `
+		SELECT id, title, ref, published_at
+		FROM manga_post
+		WHERE title = ?
+		LIMIT 1
+	`
+	queryCreateMangaPost = `
+		INSERT INTO manga_post (id, title, ref, published_at)
+		VALUES (?, ?, ?, ?)
+	`
 )

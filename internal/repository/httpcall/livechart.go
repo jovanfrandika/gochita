@@ -2,6 +2,8 @@ package rHttpcall
 
 import (
 	"encoding/xml"
+	"errors"
+	"fmt"
 	"log"
 	"net/http"
 	"regexp"
@@ -13,13 +15,17 @@ import (
 )
 
 func (r *repository) GetLatestEpisodes() (showMap map[string]m.FeedShow, err error) {
-	resp, err := http.Get(r.baseUrl + uriLatestEpisodes)
+	resp, err := r.httpClient.Get(r.livechartCfg.BaseUrl + r.livechartCfg.UriLatestEpisodes)
 	if err != nil {
 		return nil, err
 	}
 	defer resp.Body.Close()
 
-	rss := m.Rss{}
+	if resp.StatusCode != http.StatusOK {
+		return nil, errors.New(fmt.Sprintf(LABEL_STATUS_CODE, resp.StatusCode))
+	}
+
+	rss := m.RssFeed{}
 	decoder := xml.NewDecoder(resp.Body)
 	err = decoder.Decode(&rss)
 	if err != nil {
@@ -62,7 +68,7 @@ func (r *repository) GetLatestEpisodes() (showMap map[string]m.FeedShow, err err
 			showMap[showName].ShowEpisodeMap[showEpisodeNum] = m.FeedShowEpisode{
 				Num:     showEpisodeNum,
 				Ref:     item.Guid,
-				PubDate: pubDate.In(r.timeLocation),
+				PubDate: pubDate.In(r.timeCfg.TimeLocation),
 			}
 		}
 	}
@@ -71,13 +77,17 @@ func (r *repository) GetLatestEpisodes() (showMap map[string]m.FeedShow, err err
 }
 
 func (r *repository) GetLatestHeadlines() (headlineMap map[string]m.FeedHeadline, err error) {
-	resp, err := http.Get(r.baseUrl + uriLatestHeadlines)
+	resp, err := r.httpClient.Get(r.livechartCfg.BaseUrl + r.livechartCfg.UriLatestHeadlines)
 	if err != nil {
 		return nil, err
 	}
 	defer resp.Body.Close()
 
-	rss := m.Rss{}
+	if resp.StatusCode != http.StatusOK {
+		return nil, errors.New(fmt.Sprintf(LABEL_STATUS_CODE, resp.StatusCode))
+	}
+
+	rss := m.RssFeed{}
 	decoder := xml.NewDecoder(resp.Body)
 	err = decoder.Decode(&rss)
 	if err != nil {
@@ -93,7 +103,7 @@ func (r *repository) GetLatestHeadlines() (headlineMap map[string]m.FeedHeadline
 				Title:     item.Title,
 				Thumbnail: item.Enclosure.Url,
 				Ref:       item.Link,
-				PubDate:   pubDate.In(r.timeLocation),
+				PubDate:   pubDate.In(r.timeCfg.TimeLocation),
 			}
 		}
 	}

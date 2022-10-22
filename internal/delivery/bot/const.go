@@ -11,8 +11,9 @@ var (
 	SUBCOMMAND_SUBSCRIBE   = "subscribe"
 	SUBCOMMAND_UNSUBSCRIBE = "unsubscribe"
 
-	COMMAND_SHOW     = "show"
-	COMMAND_HEADLINE = "headline"
+	COMMAND_SHOW       = "show"
+	COMMAND_HEADLINE   = "headline"
+	COMMAND_MANGA_POST = "manga"
 
 	commands = []*discordgo.ApplicationCommand{
 		{
@@ -87,12 +88,12 @@ var (
 				{
 					Type:        discordgo.ApplicationCommandOptionSubCommandGroup,
 					Name:        SUBCOMMAND_SUBSCRIBE,
-					Description: "Subscribe show to this channel",
+					Description: "Subscribe headline to this channel",
 					Options: []*discordgo.ApplicationCommandOption{
 						{
 							Type:        discordgo.ApplicationCommandOptionSubCommand,
 							Name:        SUBCOMMAND_NEW,
-							Description: "Subscribe to new shows",
+							Description: "Subscribe to new headlines",
 							Required:    false,
 						},
 					},
@@ -100,12 +101,44 @@ var (
 				{
 					Type:        discordgo.ApplicationCommandOptionSubCommandGroup,
 					Name:        SUBCOMMAND_UNSUBSCRIBE,
-					Description: "Unsubscribe show to this channel",
+					Description: "Unsubscribe headline to this channel",
 					Options: []*discordgo.ApplicationCommandOption{
 						{
 							Type:        discordgo.ApplicationCommandOptionSubCommand,
 							Name:        SUBCOMMAND_NEW,
-							Description: "Unsubscribe to new shows",
+							Description: "Unsubscribe to new headlines",
+							Required:    false,
+						},
+					},
+				},
+			},
+		},
+		{
+			Name:        COMMAND_MANGA_POST,
+			Description: "Manga related commands",
+			Options: []*discordgo.ApplicationCommandOption{
+				{
+					Type:        discordgo.ApplicationCommandOptionSubCommandGroup,
+					Name:        SUBCOMMAND_SUBSCRIBE,
+					Description: "Subscribe manga post to this channel",
+					Options: []*discordgo.ApplicationCommandOption{
+						{
+							Type:        discordgo.ApplicationCommandOptionSubCommand,
+							Name:        SUBCOMMAND_NEW,
+							Description: "Subscribe to new manga posts",
+							Required:    false,
+						},
+					},
+				},
+				{
+					Type:        discordgo.ApplicationCommandOptionSubCommandGroup,
+					Name:        SUBCOMMAND_UNSUBSCRIBE,
+					Description: "Unsubscribe manga post to this channel",
+					Options: []*discordgo.ApplicationCommandOption{
+						{
+							Type:        discordgo.ApplicationCommandOptionSubCommand,
+							Name:        SUBCOMMAND_NEW,
+							Description: "Unsubscribe to new manga posts",
 							Required:    false,
 						},
 					},

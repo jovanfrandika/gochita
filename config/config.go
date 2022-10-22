@@ -6,6 +6,7 @@ import (
 	"log"
 	"os"
 	"path/filepath"
+	"time"
 
 	m "github.com/jovanfrandika/gochita/domain"
 )
@@ -23,6 +24,11 @@ func Init() (cfg *m.Config) {
 	}
 
 	err = json.Unmarshal(bts, cfg)
+	if err != nil {
+		log.Fatal(err.Error())
+	}
+
+	cfg.Time.TimeLocation, err = time.LoadLocation(cfg.Time.Timezone)
 	if err != nil {
 		log.Fatal(err.Error())
 	}

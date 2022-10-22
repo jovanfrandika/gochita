@@ -1,10 +1,5 @@
 package rHttpcall
 
-import "time"
-
 const (
-	threeDays = 3 * 24 * time.Hour
-
-	uriLatestEpisodes  = "/feeds/episodes"
-	uriLatestHeadlines = "/feeds/headlines"
+	LABEL_STATUS_CODE = "Status Code: %v"
 )

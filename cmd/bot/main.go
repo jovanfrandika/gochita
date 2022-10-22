@@ -5,7 +5,6 @@ import (
 	"os"
 	"os/signal"
 	"syscall"
-	"time"
 
 	"github.com/jovanfrandika/gochita/config"
 	dBot "github.com/jovanfrandika/gochita/internal/delivery/bot"
@@ -17,11 +16,6 @@ import (
 func main() {
 	cfg := config.Init()
 
-	timeLocation, err := time.LoadLocation(cfg.Time.Timezone)
-	if err != nil {
-		log.Fatal(err.Error())
-	}
-
 	discordBotRepo := rDiscord.New(cfg.Bot.Token)
 	if err := discordBotRepo.Connect(); err != nil {
 		log.Fatal(err)
@@ -31,8 +25,8 @@ func main() {
 	dbRepo := rCassandra.New(cfg.DB.Clusters, cfg.DB.KeyspaceName)
 	defer dbRepo.CloseConnection()
 
-	u := uBot.New(&dbRepo, &discordBotRepo, timeLocation)
-	d := dBot.New(&u)
+	u := uBot.New(&dbRepo, &discordBotRepo, &cfg.Time)
+	d := dBot.New(&u, &cfg.Time)
 
 	d.RegisterCommands()
 	d.InitHandler()

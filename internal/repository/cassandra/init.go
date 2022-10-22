@@ -37,6 +37,10 @@ type Repository interface {
 	GetHeadlinesByRange(ctx context.Context, start, end time.Time) (headlines []m.DbHeadline, err error)
 	GetHeadlineByTitle(ctx context.Context, title string) (headline m.DbHeadline, err error)
 	CreateHeadline(ctx context.Context, headline m.FeedHeadline) (headlineId string, err error)
+
+	GetMangaPostsByRange(ctx context.Context, start, end time.Time) (mangaPosts []m.DbMangaPost, err error)
+	GetMangaPostByTitle(ctx context.Context, title string) (mangaPost m.DbMangaPost, err error)
+	CreateMangaPost(ctx context.Context, mangaPost m.FeedMangaPost) (mangaPostId string, err error)
 }
 
 func New(clusters []string, keyspaceName string) Repository {

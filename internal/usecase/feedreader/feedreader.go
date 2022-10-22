@@ -1,4 +1,4 @@
-package uLivechart
+package uFeedreader
 
 import (
 	"context"
@@ -60,6 +60,22 @@ func (u *usecase) AddHeadlines(ctx context.Context) (err error) {
 		_, err := (*u.dbRepo).GetHeadlineByTitle(ctx, headlineDetail.Title)
 		if err == gocql.ErrNotFound {
 			_, err = (*u.dbRepo).CreateHeadline(ctx, headlineDetail)
+		}
+	}
+
+	return err
+}
+
+func (u *usecase) AddMangaPosts(ctx context.Context) (err error) {
+	mangaPostMap, err := (*u.client).GetLatestMangaPosts()
+	if err != nil {
+		return err
+	}
+
+	for _, mangaPostDetail := range mangaPostMap {
+		_, err := (*u.dbRepo).GetMangaPostByTitle(ctx, mangaPostDetail.Title)
+		if err == gocql.ErrNotFound {
+			_, err = (*u.dbRepo).CreateMangaPost(ctx, mangaPostDetail)
 		}
 	}
 

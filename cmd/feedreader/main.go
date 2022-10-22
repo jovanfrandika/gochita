@@ -1,33 +1,26 @@
 package main
 
 import (
-	"log"
 	"os"
 	"os/signal"
 	"syscall"
-	"time"
 
 	"github.com/jovanfrandika/gochita/config"
-	dLivechart "github.com/jovanfrandika/gochita/internal/delivery/livechart"
+	dFeedReader "github.com/jovanfrandika/gochita/internal/delivery/feedreader"
 	rCassandra "github.com/jovanfrandika/gochita/internal/repository/cassandra"
 	rHttpcall "github.com/jovanfrandika/gochita/internal/repository/httpcall"
-	uLivechart "github.com/jovanfrandika/gochita/internal/usecase/livechart"
+	uFeedReader "github.com/jovanfrandika/gochita/internal/usecase/feedreader"
 )
 
 func main() {
 	cfg := config.Init()
 
-	timeLocation, err := time.LoadLocation(cfg.Time.Timezone)
-	if err != nil {
-		log.Fatal(err.Error())
-	}
-
 	dbRepo := rCassandra.New(cfg.DB.Clusters, cfg.DB.KeyspaceName)
 	defer dbRepo.CloseConnection()
 
-	livechartClient := rHttpcall.New(cfg.LiveChart.BaseUrl, timeLocation)
-	u := uLivechart.New(&dbRepo, &livechartClient)
-	d := dLivechart.New(&u)
+	livechartClient := rHttpcall.New(cfg.LiveChart.BaseUrl, cfg.Reddit.BaseUrl, &cfg.Time)
+	u := uFeedReader.New(&dbRepo, &livechartClient, &cfg.Time)
+	d := dFeedReader.New(&u, &cfg.Time)
 
 	d.Init()
 
