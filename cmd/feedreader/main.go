@@ -18,7 +18,7 @@ func main() {
 	dbRepo := rCassandra.New(cfg.DB.Clusters, cfg.DB.KeyspaceName)
 	defer dbRepo.CloseConnection()
 
-	livechartClient := rHttpcall.New(cfg.LiveChart.BaseUrl, cfg.Reddit.BaseUrl, &cfg.Time)
+	livechartClient := rHttpcall.New(&cfg.LiveChart, &cfg.Reddit, &cfg.Time)
 	u := uFeedReader.New(&dbRepo, &livechartClient, &cfg.Time)
 	d := dFeedReader.New(&u, &cfg.Time)
 

@@ -58,7 +58,7 @@ func (r *repository) GetLatestMangaPosts() (mangaPostMap map[string]m.FeedMangaP
 			var ref string
 			for _, match := range hrefArr {
 				href := match[1]
-				if !strings.Contains(href, r.redditBaseUrl) {
+				if !strings.Contains(href, r.livechartCfg.BaseUrl) {
 					ref = href
 					break
 				}
