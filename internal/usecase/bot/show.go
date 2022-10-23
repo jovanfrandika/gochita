@@ -77,9 +77,13 @@ func (u *usecase) UnsubscribeAllShow(ctx context.Context, referenceId string) (c
 		return NO_SUBSCRIPTIONS, nil
 	}
 
-	contextIds := []string{}
+	contextIds := []gocql.UUID{}
 	for _, subscription := range dbSubscriptions {
-		contextIds = append(contextIds, subscription.ContextId)
+		uuid, err := gocql.ParseUUID(subscription.ContextId)
+		if err != nil {
+			return DEFAULT_ERROR, err
+		}
+		contextIds = append(contextIds, uuid)
 	}
 	err = (*u.dbRepo).ToggleSubscriptions(ctx, false, SUBSCRIPTION_TYPE_SPECIFIC_SHOW, referenceId, contextIds)
 	if err != nil {

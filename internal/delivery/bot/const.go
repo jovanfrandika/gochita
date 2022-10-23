@@ -6,7 +6,7 @@ var (
 	QUERY = "query"
 
 	SUBCOMMAND_LIST        = "list"
-	SUBCOMMAND_ALL         = "ALL"
+	SUBCOMMAND_ALL         = "all"
 	SUBCOMMAND_NEW         = "new"
 	SUBCOMMAND_ONE         = "one"
 	SUBCOMMAND_SUBSCRIBE   = "subscribe"

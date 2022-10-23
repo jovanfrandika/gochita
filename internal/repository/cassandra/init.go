@@ -29,7 +29,7 @@ type Repository interface {
 	GetSubscriptions(ctx context.Context, subscriptionType int, isEnabled bool) (channelSubscriptions []m.DbChannelSubscription, err error)
 	GetSubscription(ctx context.Context, subscriptionType int, referenceId, contextId string) (channelSubscription m.DbChannelSubscription, err error)
 	CreateSubscription(ctx context.Context, subscriptionType int, referenceId, contextId string) (channelSubscriptionId string, err error)
-	ToggleSubscriptions(ctx context.Context, isEnabled bool, subscriptionType int, referenceId string, contextIds []string) (err error)
+	ToggleSubscriptions(ctx context.Context, isEnabled bool, subscriptionType int, referenceId string, contextIds []gocql.UUID) (err error)
 	ToggleSubscription(ctx context.Context, isEnabled bool, subscriptionType int, referenceId, contextId string) (err error)
 
 	GetNotification(ctx context.Context, channelSubscriptionId string) (channelNotification m.DbChannelNotification, err error)

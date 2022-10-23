@@ -78,7 +78,7 @@ func (r *repository) CreateSubscription(ctx context.Context, subscriptionType in
 	return channelSubscriptionId, err
 }
 
-func (r *repository) ToggleSubscriptions(ctx context.Context, isEnabled bool, subscriptionType int, referenceId string, contextIds []string) (err error) {
+func (r *repository) ToggleSubscriptions(ctx context.Context, isEnabled bool, subscriptionType int, referenceId string, contextIds []gocql.UUID) (err error) {
 	err = r.session.Query(queryToggleSubscription, isEnabled, subscriptionType, referenceId, contextIds).Exec()
 	return err
 }
