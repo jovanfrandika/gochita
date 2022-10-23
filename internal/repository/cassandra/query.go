@@ -67,10 +67,16 @@ const (
 		INSERT INTO channel_subscription (id, subscription_type, reference_id, context_id, is_enabled)
 		VALUES (?, ?, ?, ?, True)
 	`
+	queryToggleSubscriptions = `
+		UPDATE channel_subscription
+		SET is_enabled = ?
+		WHERE subscription_type = ? AND reference_id = ? AND context_id IN ?
+		IF EXISTS
+	`
 	queryToggleSubscription = `
 		UPDATE channel_subscription
 		SET is_enabled = ?
-		WHERE subscription_type = ? AND reference_id = ? AND context_id  = ?
+		WHERE subscription_type = ? AND reference_id = ? AND context_id = ?
 		IF EXISTS
 	`
 

@@ -6,6 +6,7 @@ var (
 	QUERY = "query"
 
 	SUBCOMMAND_LIST        = "list"
+	SUBCOMMAND_ALL         = "ALL"
 	SUBCOMMAND_NEW         = "new"
 	SUBCOMMAND_ONE         = "one"
 	SUBCOMMAND_SUBSCRIBE   = "subscribe"
@@ -75,6 +76,12 @@ var (
 							Type:        discordgo.ApplicationCommandOptionSubCommand,
 							Name:        SUBCOMMAND_NEW,
 							Description: "Unsubscribe to new shows",
+							Required:    false,
+						},
+						{
+							Type:        discordgo.ApplicationCommandOptionSubCommand,
+							Name:        SUBCOMMAND_ALL,
+							Description: "Unsubscribe to all shows",
 							Required:    false,
 						},
 					},

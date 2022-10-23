@@ -34,6 +34,7 @@ const (
 
 	NO_SUBSCRIPTIONS = "No subscriptions"
 	DEFAULT_ERROR    = "Oops something went wrong!"
+	DEFAULT_SUCCESS  = "Done :D"
 
 	SUBSCRIPTION_TYPE_NEW_SHOW            = 1
 	SUBSCRIPTION_TYPE_SPECIFIC_SHOW       = 2

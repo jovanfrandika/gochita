@@ -25,6 +25,7 @@ type Usecase interface {
 	SubscribeNewHeadline(ctx context.Context, referenceId string) (content string, err error)
 	SubscribeNewMangaPost(ctx context.Context, referenceId string) (content string, err error)
 
+	UnsubscribeAllShow(ctx context.Context, referenceId string) (content string, err error)
 	UnsubscribeNewShow(ctx context.Context, referenceId string) (content string, err error)
 	UnsubscribeSpecificShow(ctx context.Context, referenceId string, showTitle string) (content string, err error)
 	UnsubscribeNewHeadline(ctx context.Context, referenceId string) (content string, err error)

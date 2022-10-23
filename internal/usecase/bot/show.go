@@ -67,6 +67,28 @@ func (u *usecase) SubscribeSpecificShow(ctx context.Context, referenceId string,
 	return fmt.Sprintf(LABEL_SUCCESS_SPECIFIC_SHOW_SUBSCRIPTION, showTitle), nil
 }
 
+func (u *usecase) UnsubscribeAllShow(ctx context.Context, referenceId string) (content string, err error) {
+	dbSubscriptions, err := (*u.dbRepo).GetSubscriptionsByReferenceId(ctx, SUBSCRIPTION_TYPE_SPECIFIC_SHOW, referenceId, true)
+	if err != nil {
+		return DEFAULT_ERROR, err
+	}
+
+	if len(dbSubscriptions) <= 0 {
+		return NO_SUBSCRIPTIONS, nil
+	}
+
+	contextIds := []string{}
+	for _, subscription := range dbSubscriptions {
+		contextIds = append(contextIds, subscription.ContextId)
+	}
+	err = (*u.dbRepo).ToggleSubscriptions(ctx, false, SUBSCRIPTION_TYPE_SPECIFIC_SHOW, referenceId, contextIds)
+	if err != nil {
+		return DEFAULT_ERROR, err
+	}
+
+	return DEFAULT_SUCCESS, nil
+}
+
 func (u *usecase) UnsubscribeNewShow(ctx context.Context, referenceId string) (content string, err error) {
 	dbSubscription, _ := (*u.dbRepo).GetSubscription(ctx, SUBSCRIPTION_TYPE_NEW_SHOW, referenceId, NO_CONTEXT_ID)
 	if err == gocql.ErrNotFound {

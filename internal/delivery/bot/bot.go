@@ -67,6 +67,8 @@ func (d *delivery) InitHandler() {
 			case SUBCOMMAND_UNSUBSCRIBE:
 				options = options[0].Options
 				switch options[0].Name {
+				case SUBCOMMAND_ALL:
+					d.unsubscribeAllShow(s, i)
 				case SUBCOMMAND_NEW:
 					d.unsubscribeNewShow(s, i)
 				case SUBCOMMAND_ONE:

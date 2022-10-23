@@ -78,6 +78,11 @@ func (r *repository) CreateSubscription(ctx context.Context, subscriptionType in
 	return channelSubscriptionId, err
 }
 
+func (r *repository) ToggleSubscriptions(ctx context.Context, isEnabled bool, subscriptionType int, referenceId string, contextIds []string) (err error) {
+	err = r.session.Query(queryToggleSubscription, isEnabled, subscriptionType, referenceId, contextIds).Exec()
+	return err
+}
+
 func (r *repository) ToggleSubscription(ctx context.Context, isEnabled bool, subscriptionType int, referenceId, contextId string) (err error) {
 	err = r.session.Query(queryToggleSubscription, isEnabled, subscriptionType, referenceId, contextId).Exec()
 	return err
