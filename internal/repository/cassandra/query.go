@@ -71,7 +71,6 @@ const (
 		UPDATE channel_subscription
 		SET is_enabled = ?
 		WHERE subscription_type = ? AND reference_id = ? AND context_id IN ?
-		IF EXISTS
 	`
 	queryToggleSubscription = `
 		UPDATE channel_subscription
