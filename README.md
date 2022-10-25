@@ -77,6 +77,8 @@ make build-bot && make run-bot
 
 /show unsubscribe one query:<show title> - To unsubscribe a show to a channel
 
+/show unsubscribe all - To unsubscribe all shows to a channel
+
 /headline subscribe new - To subscribe new headlines to a channel
 
 /headline unsubscribe new - To unsubscribe new headlines to a channel
@@ -87,7 +89,9 @@ make build-bot && make run-bot
 
 # Roadmap
 
-- Notify new manga update
+- Show list pagination
+- Woof voice effect
+- Full text search on show titles
 
 ## Contributing
 ```

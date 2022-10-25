@@ -61,7 +61,7 @@ func (d *delivery) InitHandler() {
 				case SUBCOMMAND_NEW:
 					d.subscribeNewShow(s, i)
 				case SUBCOMMAND_ONE:
-					d.unsubscribeSpecificShow(s, i)
+					d.subscribeSpecificShow(s, i)
 				default:
 				}
 			case SUBCOMMAND_UNSUBSCRIBE:
