@@ -49,7 +49,7 @@ func New(clusters []string, keyspaceName string, timeout int) Repository {
 	cluster.Consistency = gocql.Quorum
 	cluster.Timeout = time.Duration(timeout) * time.Second
 
-	var r *repository
+	r := &repository{}
 	var err error
 	r.session, err = cluster.CreateSession()
 	if err != nil {
