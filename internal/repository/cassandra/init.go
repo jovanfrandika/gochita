@@ -10,7 +10,6 @@ import (
 )
 
 type repository struct {
-	cluster *gocql.ClusterConfig
 	session *gocql.Session
 }
 
@@ -44,15 +43,15 @@ type Repository interface {
 	CreateMangaPost(ctx context.Context, mangaPost m.FeedMangaPost) (mangaPostId string, err error)
 }
 
-func New(clusters []string, keyspaceName string) Repository {
-	r := &repository{
-		cluster: gocql.NewCluster(clusters...),
-	}
-	r.cluster.Keyspace = keyspaceName
-	r.cluster.Consistency = gocql.Quorum
+func New(clusters []string, keyspaceName string, timeout int) Repository {
+	cluster := gocql.NewCluster(clusters...)
+	cluster.Keyspace = keyspaceName
+	cluster.Consistency = gocql.Quorum
+	cluster.Timeout = time.Duration(timeout) * time.Second
 
+	var r *repository
 	var err error
-	r.session, err = r.cluster.CreateSession()
+	r.session, err = cluster.CreateSession()
 	if err != nil {
 		log.Fatal(err)
 	}

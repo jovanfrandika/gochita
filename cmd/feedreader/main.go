@@ -15,7 +15,7 @@ import (
 func main() {
 	cfg := config.Init()
 
-	dbRepo := rCassandra.New(cfg.DB.Clusters, cfg.DB.KeyspaceName)
+	dbRepo := rCassandra.New(cfg.DB.Clusters, cfg.DB.KeyspaceName, cfg.DB.Timeout)
 	defer dbRepo.CloseConnection()
 
 	livechartClient := rHttpcall.New(&cfg.LiveChart, &cfg.Reddit, &cfg.Time)

@@ -10,7 +10,7 @@ import (
 
 func (r *repository) GetMangaPostsByRange(ctx context.Context, start, end time.Time) (mangaPosts []m.DbMangaPost, err error) {
 	mangaPosts = []m.DbMangaPost{}
-	iter := r.session.Query(queryGetMangaPostsByRange, start, end).Iter()
+	iter := r.session.Query(queryGetMangaPostsByRange, start, end).WithContext(ctx).Iter()
 	var mangaPost m.DbMangaPost
 	for iter.Scan(&mangaPost.Id, &mangaPost.Title, &mangaPost.Ref, &mangaPost.PublishedAt) {
 		mangaPosts = append(mangaPosts, mangaPost)
@@ -24,13 +24,13 @@ func (r *repository) GetMangaPostsByRange(ctx context.Context, start, end time.T
 
 func (r *repository) GetMangaPostByTitle(ctx context.Context, title string) (mangaPost m.DbMangaPost, err error) {
 	mangaPost = m.DbMangaPost{}
-	err = r.session.Query(queryGetMangaPostByTitle, title).Consistency(gocql.One).Scan(&mangaPost.Id, &mangaPost.Title, &mangaPost.Ref, &mangaPost.PublishedAt)
+	err = r.session.Query(queryGetMangaPostByTitle, title).Consistency(gocql.One).WithContext(ctx).Scan(&mangaPost.Id, &mangaPost.Title, &mangaPost.Ref, &mangaPost.PublishedAt)
 	return mangaPost, err
 }
 
 func (r *repository) CreateMangaPost(ctx context.Context, mangaPost m.FeedMangaPost) (mangaPostId string, err error) {
 	uuid := gocql.TimeUUID()
-	err = r.session.Query(queryCreateMangaPost, uuid, mangaPost.Title, mangaPost.Ref, mangaPost.PubDate).Exec()
+	err = r.session.Query(queryCreateMangaPost, uuid, mangaPost.Title, mangaPost.Ref, mangaPost.PubDate).WithContext(ctx).Exec()
 	if err != nil {
 		return "", err
 	}

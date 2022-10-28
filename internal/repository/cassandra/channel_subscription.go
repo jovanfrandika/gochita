@@ -9,7 +9,7 @@ import (
 
 func (r *repository) GetSubscriptionsByReferenceId(ctx context.Context, subscriptionType int, referenceId string, isEnabled bool) (channelSubscriptions []m.DbChannelSubscription, err error) {
 	channelSubscriptions = []m.DbChannelSubscription{}
-	iter := r.session.Query(queryGetSubscriptionsByReferenceId, subscriptionType, referenceId, isEnabled).Iter()
+	iter := r.session.Query(queryGetSubscriptionsByReferenceId, subscriptionType, referenceId, isEnabled).WithContext(ctx).Iter()
 	if err != nil {
 		return []m.DbChannelSubscription{}, err
 	}
@@ -26,7 +26,7 @@ func (r *repository) GetSubscriptionsByReferenceId(ctx context.Context, subscrip
 
 func (r *repository) GetSubscriptionsByContextId(ctx context.Context, subscriptionType int, contextId string, isEnabled bool) (channelSubscriptions []m.DbChannelSubscription, err error) {
 	channelSubscriptions = []m.DbChannelSubscription{}
-	iter := r.session.Query(queryGetSubscriptionsByContextId, subscriptionType, contextId, isEnabled).Iter()
+	iter := r.session.Query(queryGetSubscriptionsByContextId, subscriptionType, contextId, isEnabled).WithContext(ctx).Iter()
 	if err != nil {
 		return []m.DbChannelSubscription{}, err
 	}
@@ -43,7 +43,7 @@ func (r *repository) GetSubscriptionsByContextId(ctx context.Context, subscripti
 
 func (r *repository) GetSubscriptions(ctx context.Context, subscriptionType int, isEnabled bool) (channelSubscriptions []m.DbChannelSubscription, err error) {
 	channelSubscriptions = []m.DbChannelSubscription{}
-	iter := r.session.Query(queryGetSubscriptions, subscriptionType, isEnabled).Iter()
+	iter := r.session.Query(queryGetSubscriptions, subscriptionType, isEnabled).WithContext(ctx).Iter()
 	if err != nil {
 		return []m.DbChannelSubscription{}, err
 	}
@@ -60,7 +60,7 @@ func (r *repository) GetSubscriptions(ctx context.Context, subscriptionType int,
 
 func (r *repository) GetSubscription(ctx context.Context, subscriptionType int, referenceId, contextId string) (channelSubscription m.DbChannelSubscription, err error) {
 	channelSubscription = m.DbChannelSubscription{}
-	err = r.session.Query(queryGetSubscription, subscriptionType, referenceId, contextId).Consistency(gocql.One).Scan(&channelSubscription.Id, &channelSubscription.SubscriptionType, &channelSubscription.ReferenceId, &channelSubscription.ContextId, &channelSubscription.IsEnabled)
+	err = r.session.Query(queryGetSubscription, subscriptionType, referenceId, contextId).Consistency(gocql.One).WithContext(ctx).Scan(&channelSubscription.Id, &channelSubscription.SubscriptionType, &channelSubscription.ReferenceId, &channelSubscription.ContextId, &channelSubscription.IsEnabled)
 	if err != nil {
 		return m.DbChannelSubscription{}, err
 	}
@@ -70,7 +70,7 @@ func (r *repository) GetSubscription(ctx context.Context, subscriptionType int, 
 
 func (r *repository) CreateSubscription(ctx context.Context, subscriptionType int, referenceId, contextId string) (channelSubscriptionId string, err error) {
 	uuid := gocql.TimeUUID()
-	err = r.session.Query(queryCreateSubscription, uuid, subscriptionType, referenceId, contextId).Exec()
+	err = r.session.Query(queryCreateSubscription, uuid, subscriptionType, referenceId, contextId).WithContext(ctx).Exec()
 	if err != nil {
 		return "", err
 	}
@@ -79,11 +79,11 @@ func (r *repository) CreateSubscription(ctx context.Context, subscriptionType in
 }
 
 func (r *repository) ToggleSubscriptions(ctx context.Context, isEnabled bool, subscriptionType int, referenceId string, contextIds []gocql.UUID) (err error) {
-	err = r.session.Query(queryToggleSubscriptions, isEnabled, subscriptionType, referenceId, contextIds).Exec()
+	err = r.session.Query(queryToggleSubscriptions, isEnabled, subscriptionType, referenceId, contextIds).WithContext(ctx).Exec()
 	return err
 }
 
 func (r *repository) ToggleSubscription(ctx context.Context, isEnabled bool, subscriptionType int, referenceId, contextId string) (err error) {
-	err = r.session.Query(queryToggleSubscription, isEnabled, subscriptionType, referenceId, contextId).Exec()
+	err = r.session.Query(queryToggleSubscription, isEnabled, subscriptionType, referenceId, contextId).WithContext(ctx).Exec()
 	return err
 }

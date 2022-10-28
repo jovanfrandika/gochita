@@ -22,7 +22,8 @@ Example configuration file
   },
   "db": {
     "keyspaceName": "",
-    "clusters": ["127.0.0.1:9042"]
+    "clusters": ["127.0.0.1:9042"],
+    "timeout": 1 // in seconds
   },
   "liveChart": {
     "baseUrl": "https://www.livechart.me",
@@ -31,7 +32,7 @@ Example configuration file
   },
   "reddit": {
     "baseUrl": "https://www.reddit.com",
-	  "uriLatestMangaPosts": "/r/manga/new/.rss"
+    "uriLatestMangaPosts": "/r/manga/new/.rss"
   },
   "time": {
     "timezone": "Asia/Jakarta",

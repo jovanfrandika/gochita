@@ -22,7 +22,7 @@ func main() {
 	}
 	defer discordBotRepo.Close()
 
-	dbRepo := rCassandra.New(cfg.DB.Clusters, cfg.DB.KeyspaceName)
+	dbRepo := rCassandra.New(cfg.DB.Clusters, cfg.DB.KeyspaceName, cfg.DB.Timeout)
 	defer dbRepo.CloseConnection()
 
 	u := uBot.New(&dbRepo, &discordBotRepo, &cfg.Time)

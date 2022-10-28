@@ -9,6 +9,7 @@ type BotConfig struct {
 type DBConfig struct {
 	KeyspaceName string   `json:"keyspaceName"`
 	Clusters     []string `json:"clusters"`
+	Timeout      int      `json:timeout`
 }
 
 type LiveChartConfig struct {

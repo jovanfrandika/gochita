@@ -10,7 +10,7 @@ import (
 
 func (r *repository) GetHeadlinesByRange(ctx context.Context, start, end time.Time) (headlines []m.DbHeadline, err error) {
 	headlines = []m.DbHeadline{}
-	iter := r.session.Query(queryGetHeadlinesByRange, start, end).Iter()
+	iter := r.session.Query(queryGetHeadlinesByRange, start, end).WithContext(ctx).Iter()
 	var headline m.DbHeadline
 	for iter.Scan(&headline.Id, &headline.Title, &headline.Thumbnail, &headline.Ref, &headline.PublishedAt) {
 		headlines = append(headlines, headline)
@@ -24,13 +24,13 @@ func (r *repository) GetHeadlinesByRange(ctx context.Context, start, end time.Ti
 
 func (r *repository) GetHeadlineByTitle(ctx context.Context, title string) (headline m.DbHeadline, err error) {
 	headline = m.DbHeadline{}
-	err = r.session.Query(queryGetHeadlineByTitle, title).Consistency(gocql.One).Scan(&headline.Id, &headline.Title, &headline.Thumbnail, &headline.Ref, &headline.PublishedAt)
+	err = r.session.Query(queryGetHeadlineByTitle, title).Consistency(gocql.One).WithContext(ctx).Scan(&headline.Id, &headline.Title, &headline.Thumbnail, &headline.Ref, &headline.PublishedAt)
 	return headline, err
 }
 
 func (r *repository) CreateHeadline(ctx context.Context, headline m.FeedHeadline) (headlineId string, err error) {
 	uuid := gocql.TimeUUID()
-	err = r.session.Query(queryCreateHeadline, uuid, headline.Title, headline.Thumbnail, headline.Ref, headline.PubDate).Exec()
+	err = r.session.Query(queryCreateHeadline, uuid, headline.Title, headline.Thumbnail, headline.Ref, headline.PubDate).WithContext(ctx).Exec()
 	if err != nil {
 		return "", err
 	}
