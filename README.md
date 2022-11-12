@@ -12,58 +12,40 @@ Currently, Gochita consists of two binaries. The first one is the RSS feed reade
 
 ## Configuration
 
-Make a configuration file at files/config.json
+Make a configuration file at /.env
 
 Example configuration file
-```JSON
-{
-  "bot": {
-    "token": ""
-  },
-  "db": {
-    "keyspaceName": "",
-    "clusters": ["127.0.0.1:9042"],
-    "timeout": 1 // in seconds
-  },
-  "liveChart": {
-    "baseUrl": "https://www.livechart.me",
-    "uriLatestEpisodes": "/feeds/episodes",
-    "uriLatestHeadlines": "/feeds/headlines"
-  },
-  "reddit": {
-    "baseUrl": "https://www.reddit.com",
-    "uriLatestMangaPosts": "/r/manga/new/.rss"
-  },
-  "time": {
-    "timezone": "Asia/Jakarta",
-    "defaultTimeout": 1, // in seconds
-    "notifyTimeout": 5, // in seconds
-    "setCommandsTimeout": 10, // in seconds
-    "notifyShowsInterval": 5, // in minutes
-    "notfiyHeadlinesInterval": 10, // in minutes
-    "notifyMangasInterval": 5, // in minutes
-    "addShowsInterval": 60, // in seconds
-    "addHeadlinesInterval": 60, // in seconds
-    "addMangasInterval": 60 // in seconds
-  }
-}
+```dosini
+TOKEN=""
+
+KEYSPACE_NAME= "gochita"
+CLUSTER="cassandra:9042"
+TIMEOUT="5"
+
+LIVECHART_BASE_URL="https://www.livechart.me"
+LIVECHART_LATEST_EPISODES_URI="/feeds/episodes"
+LIVECHART_LATEST_HEADLINES_URI="/feeds/headlines"
+
+REDDIT_BASE_URL="https://www.reddit.com"
+REDDIT_LATEST_MANGA_POSTS_URI="/r/manga/new/.rss"
+
+TIMEZONE="Asia/Jakarta"
+DEFAULT_TIMEOUT="1"
+NOTIFY_TIMEOUT="5"
+SET_COMMANDS_TIMEOUT="10"
+NOTIFY_SHOWS_INTERVAL="5"
+NOTIFY_HEADLINES_INTERVAL="10"
+NOTIFY_MANGAS_INTERVAL="5"
+ADD_SHOWS_INTERVAL="60"
+ADD_HEADLINES_INTERVAL="60"
+ADD_MANGAS_INTERVAL="60"
 ```
 
 ## Installation
 
 To migrate database, run this
 ```bash
-make migrate-up db="cassandra://localhost:9042/example"
-```
-
-To use the livechart data grabber, run this
-```bash
-make build-livechart && make run-livechart
-```
-
-To turn on the discord bot, run this
-```bash
-make build-bot && make run-bot
+make migrate-up DB="example"
 ```
 
 ## Commands

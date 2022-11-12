@@ -4,20 +4,14 @@ build-bot:
 build-feedreader: 
 	go build -o ./bin/feedreader ./cmd/feedreader/main.go
 
-run-bot:
-	./bin/bot
-
-run-feedreader:
-	./bin/feedreader
-
 migrate-up:
-	migrate -path db/migration -database ${db} -verbose up
+	docker compose --profile tools run migrate
 
-migrate-down:
-	migrate -path db/migration -database ${db} -verbose down
+migrate-create:
+	docker compose --profile tools run create-migration ${name}
 
-test:
-	go test -cover -race ./...
+up:
+	docker compose up -d 
 
-clean-build:
-	rm -f ./bin/*
+rebuild:
+	docker compose build --no-cache

@@ -54,10 +54,10 @@ func (u *usecase) SubscribeSpecificShow(ctx context.Context, referenceId string,
 		return fmt.Sprintf(LABEL_UNSUCCESS_SPECIFIC_SHOW_SUBSCRIPTION, showTitle), err
 	}
 
-	dbSubscription, err := (*u.dbRepo).GetSubscription(ctx, SUBSCRIPTION_TYPE_SPECIFIC_SHOW, referenceId, dbShow.Id)
+	_, err = (*u.dbRepo).GetSubscription(ctx, SUBSCRIPTION_TYPE_SPECIFIC_SHOW, referenceId, dbShow.Id)
 	if err == gocql.ErrNotFound {
 		_, err = (*u.dbRepo).CreateSubscription(ctx, SUBSCRIPTION_TYPE_SPECIFIC_SHOW, referenceId, dbShow.Id)
-	} else if !dbSubscription.IsEnabled {
+	} else {
 		err = (*u.dbRepo).ToggleSubscription(ctx, true, SUBSCRIPTION_TYPE_SPECIFIC_SHOW, referenceId, dbShow.Id)
 	}
 	if err != nil {

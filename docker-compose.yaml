@@ -1,0 +1,63 @@
+version: '3.9'
+
+services:
+  db:
+    image: cassandra:4.0
+    container_name: cassandra
+    ports:
+      - 9042:9042
+    networks:
+      - gochitanetwork
+    volumes:
+      - cassandra:/var/lib/cassandra
+
+  bot:
+    build: 
+      context: .
+      dockerfile: ./docker/bot/Dockerfile
+    container_name: bot
+    env_file:
+      - .env
+    restart: unless-stopped
+    networks:
+      - gochitanetwork
+    depends_on:
+      - db
+
+  feedreader:
+    build: 
+      context: .
+      dockerfile: ./docker/feedreader/Dockerfile
+    container_name: feedreader
+    env_file:
+      - .env
+    restart: unless-stopped
+    networks:
+      - gochitanetwork
+    depends_on:
+      - db
+
+  migrate: &basemigrate
+    profiles: ["tools"]
+    image: migrate/migrate
+    entrypoint: "migrate -path /tmp/migrations -database cassandra://cassandra:4092/${DB}"
+    command: up
+    networks:
+      - gochitanetwork
+    depends_on:
+      - db
+    volumes:
+      - ./db/migration:/tmp/migrations
+
+  create-migration:
+    <<: *basemigrate
+    entrypoint: migrate create -dir /tmp/migrations -ext cql
+    command: ""
+
+volumes:
+  cassandra:
+
+networks:
+  gochitanetwork:
+    name: gochitanetwork
+    external: true
