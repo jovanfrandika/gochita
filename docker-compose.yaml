@@ -40,7 +40,7 @@ services:
   migrate: &basemigrate
     profiles: ["tools"]
     image: migrate/migrate
-    entrypoint: "migrate -path /tmp/migrations -database cassandra://cassandra:4092/${DB}"
+    entrypoint: "migrate -path /tmp/migrations -database cassandra://cassandra:9042/${DB}"
     command: up
     networks:
       - gochitanetwork
